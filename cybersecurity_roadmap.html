@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Cybersecurity Career Roadmap — 4 domains, 48 roles. Red Team, Blue Team, Purple Team, GRC explained for workshop.">
+<title>Cybersecurity Roadmap — Workshop Edition</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --red:#ff3e6c;--blue:#00b4ff;--purple:#a855f7;--green:#00e5b4;
+  --bg:#050a14;--bg2:#0a1220;--bg3:#0d1828;
+  --text:#e2e8f0;--text2:#94a3b8;--text3:#475569;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;min-height:100vh;overflow-x:hidden;}
+#canvas-bg{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;opacity:0.3;}
+
+/* SCAN LINE — uses transform for performance */
+.scan-line{
+  position:fixed;left:0;width:100%;height:2px;z-index:0;pointer-events:none;top:0;
+  background:linear-gradient(90deg,transparent,rgba(0,180,255,0.1),rgba(139,92,246,0.12),transparent);
+  animation:scan 7s linear infinite;
+}
+@keyframes scan{0%{transform:translateY(-4px)}100%{transform:translateY(100vh)}}
+
+.page-wrap{position:relative;z-index:1;padding:40px 24px 80px;max-width:1600px;margin:0 auto;}
+
+/* ── HEADER ── */
+.header{text-align:center;margin-bottom:44px;animation:fadeDown 0.8s ease both;}
+.header-badge{
+  display:inline-block;font-family:'Orbitron',monospace;font-size:11px;letter-spacing:4px;
+  color:var(--blue);border:1px solid var(--blue);padding:5px 18px;border-radius:30px;margin-bottom:18px;
+  box-shadow:0 0 14px rgba(0,180,255,0.3);animation:pulse-badge 3s ease-in-out infinite;
+}
+@keyframes pulse-badge{0%,100%{box-shadow:0 0 14px rgba(0,180,255,0.3)}50%{box-shadow:0 0 28px rgba(0,180,255,0.6)}}
+.header h1{
+  font-family:'Orbitron',monospace;font-size:clamp(24px,4.5vw,52px);font-weight:900;letter-spacing:2px;
+  background:linear-gradient(135deg,#60a5fa 0%,#a855f7 50%,#818cf8 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  line-height:1.15;margin-bottom:10px;
+}
+.header p{font-size:15px;color:var(--text2);letter-spacing:1px;}
+
+/* ── COUNTDOWN ── */
+.countdown-wrap{
+  display:flex;justify-content:center;margin-bottom:44px;
+  animation:fadeUp 0.7s ease both 0.15s;
+}
+.countdown-card{
+  background:var(--bg2);border:1px solid rgba(139,92,246,0.3);border-radius:14px;
+  padding:18px 32px;display:flex;align-items:center;gap:24px;flex-wrap:wrap;justify-content:center;
+  box-shadow:0 0 24px rgba(139,92,246,0.1);
+}
+.countdown-label{font-family:'Orbitron',monospace;font-size:10px;letter-spacing:3px;color:var(--text3);text-align:center;margin-bottom:4px;}
+.countdown-units{display:flex;gap:16px;align-items:center;}
+.countdown-unit{text-align:center;}
+.countdown-num{
+  font-family:'Orbitron',monospace;font-size:28px;font-weight:900;color:#c4b5fd;
+  line-height:1;display:block;min-width:44px;
+}
+.countdown-sep{font-family:'Orbitron',monospace;font-size:22px;color:rgba(139,92,246,0.4);margin-bottom:14px;}
+.countdown-unit-label{font-size:10px;letter-spacing:2px;color:var(--text3);text-transform:uppercase;}
+.workshop-tag{
+  display:flex;align-items:center;gap:8px;
+  font-family:'Orbitron',monospace;font-size:10px;letter-spacing:2px;color:#a855f7;
+}
+.live-dot{width:8px;height:8px;border-radius:50%;background:#a855f7;box-shadow:0 0 8px #a855f7;animation:blink 1.2s ease-in-out infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.2}}
+
+/* ── STATS STRIP ── */
+.stats-strip{
+  display:flex;flex-wrap:wrap;justify-content:center;gap:12px;margin-bottom:44px;
+  animation:fadeUp 0.7s ease both 0.25s;
+}
+.stat-pill{
+  display:flex;align-items:center;gap:10px;
+  background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);
+  padding:10px 20px;border-radius:40px;
+}
+.stat-pill-num{font-family:'Orbitron',monospace;font-size:18px;font-weight:700;color:var(--text);}
+.stat-pill-label{font-size:12px;color:var(--text2);letter-spacing:0.5px;}
+
+/* ── CENTER NODE ── */
+.center-node{display:flex;justify-content:center;margin-bottom:0;}
+.center-box{
+  background:linear-gradient(135deg,#0f1e3a,#1a0d2e);
+  position:relative;padding:20px 52px;
+  font-family:'Orbitron',monospace;font-size:13px;font-weight:700;letter-spacing:2px;color:#c4b5fd;
+  clip-path:polygon(14px 0%,calc(100% - 14px) 0%,100% 14px,100% calc(100% - 14px),calc(100% - 14px) 100%,14px 100%,0% calc(100% - 14px),0% 14px);
+  box-shadow:0 0 30px rgba(139,92,246,0.25),inset 0 0 20px rgba(59,130,246,0.05);
+  animation:fadeDown 0.6s ease both 0.2s,core-pulse 4s ease-in-out infinite 1s;
+}
+.center-box::after{
+  content:'';position:absolute;inset:-2px;z-index:-1;
+  background:linear-gradient(135deg,#3b82f6,#8b5cf6);
+  clip-path:polygon(14px 0%,calc(100% - 14px) 0%,100% 14px,100% calc(100% - 14px),calc(100% - 14px) 100%,14px 100%,0% calc(100% - 14px),0% 14px);
+}
+@keyframes core-pulse{0%,100%{box-shadow:0 0 30px rgba(139,92,246,0.25)}50%{box-shadow:0 0 55px rgba(139,92,246,0.5)}}
+
+/* ── CONNECTOR ── */
+.connector-area{height:70px;position:relative;}
+#connector-svg{position:absolute;top:0;left:0;width:100%;height:100%;overflow:visible;}
+
+/* ── DOMAIN GRID ── */
+.domain-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;animation:fadeUp 0.8s ease both 0.5s;}
+@media(max-width:1100px){.domain-grid{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:600px){.domain-grid{grid-template-columns:1fr;}}
+
+/* ── DOMAIN CARD ── BUG FIXES: correct hover selector + border-color in transition */
+.domain-card{
+  border-radius:12px;overflow:hidden;position:relative;
+  /* FIX: added border-color to transition */
+  transition:transform 0.3s ease,box-shadow 0.3s ease,border-color 0.3s ease;
+  animation:fadeUp 0.7s ease both;cursor:pointer;
+}
+/* FIX: correct selector .domain-card.red:hover (was .domain-card:hover.red) */
+.domain-card.red   {border:1.5px solid rgba(255,62,108,0.4);box-shadow:0 8px 40px rgba(255,62,108,0.12);}
+.domain-card.blue  {border:1.5px solid rgba(0,180,255,0.4);box-shadow:0 8px 40px rgba(0,180,255,0.12);animation-delay:0.12s;}
+.domain-card.purple{border:1.5px solid rgba(168,85,247,0.4);box-shadow:0 8px 40px rgba(168,85,247,0.12);animation-delay:0.24s;}
+.domain-card.green {border:1.5px solid rgba(0,229,180,0.4);box-shadow:0 8px 40px rgba(0,229,180,0.12);animation-delay:0.36s;}
+.domain-card:hover{transform:translateY(-6px);}
+.domain-card.red:hover   {border-color:rgba(255,62,108,0.85);box-shadow:0 18px 60px rgba(255,62,108,0.28);}
+.domain-card.blue:hover  {border-color:rgba(0,180,255,0.85);box-shadow:0 18px 60px rgba(0,180,255,0.28);}
+.domain-card.purple:hover{border-color:rgba(168,85,247,0.85);box-shadow:0 18px 60px rgba(168,85,247,0.28);}
+.domain-card.green:hover {border-color:rgba(0,229,180,0.85);box-shadow:0 18px 60px rgba(0,229,180,0.28);}
+
+.card-inner{background:var(--bg2);border-radius:11px;height:100%;display:flex;flex-direction:column;}
+.domain-header{padding:20px 18px 16px;position:relative;overflow:hidden;}
+.domain-card.red   .domain-header{background:linear-gradient(135deg,rgba(255,62,108,0.15) 0%,transparent 70%);}
+.domain-card.blue  .domain-header{background:linear-gradient(135deg,rgba(0,180,255,0.15) 0%,transparent 70%);}
+.domain-card.purple.domain-header{background:linear-gradient(135deg,rgba(168,85,247,0.15) 0%,transparent 70%);}
+.domain-card.green .domain-header{background:linear-gradient(135deg,rgba(0,229,180,0.15) 0%,transparent 70%);}
+
+.domain-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:11px;}
+.domain-card.red   .domain-icon{background:rgba(255,62,108,0.12);border:1px solid rgba(255,62,108,0.35);}
+.domain-card.blue  .domain-icon{background:rgba(0,180,255,0.12);border:1px solid rgba(0,180,255,0.35);}
+.domain-card.purple .domain-icon{background:rgba(168,85,247,0.12);border:1px solid rgba(168,85,247,0.35);}
+.domain-card.green .domain-icon{background:rgba(0,229,180,0.12);border:1px solid rgba(0,229,180,0.35);}
+
+.domain-tag{display:inline-block;font-family:'Orbitron',monospace;font-size:9px;letter-spacing:3px;font-weight:600;padding:3px 10px;border-radius:20px;margin-bottom:7px;text-transform:uppercase;}
+.domain-card.red   .domain-tag{background:rgba(255,62,108,0.12);color:#ff3e6c;border:1px solid rgba(255,62,108,0.28);}
+.domain-card.blue  .domain-tag{background:rgba(0,180,255,0.12);color:#00b4ff;border:1px solid rgba(0,180,255,0.28);}
+.domain-card.purple .domain-tag{background:rgba(168,85,247,0.12);color:#a855f7;border:1px solid rgba(168,85,247,0.28);}
+.domain-card.green .domain-tag{background:rgba(0,229,180,0.12);color:#00e5b4;border:1px solid rgba(0,229,180,0.28);}
+
+.domain-title{font-family:'Orbitron',monospace;font-size:14px;font-weight:700;letter-spacing:1px;line-height:1.3;margin-bottom:3px;}
+.domain-card.red   .domain-title{color:#ff8fa3;}
+.domain-card.blue  .domain-title{color:#7dd3fc;}
+.domain-card.purple .domain-title{color:#d8b4fe;}
+.domain-card.green .domain-title{color:#6ee7b7;}
+.domain-subtitle{font-size:12px;color:var(--text2);letter-spacing:0.5px;}
+
+.role-count{position:absolute;top:18px;right:18px;font-family:'Orbitron',monospace;font-size:11px;font-weight:700;width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;}
+.domain-card.red   .role-count{background:rgba(255,62,108,0.1);color:#ff3e6c;border:1px solid rgba(255,62,108,0.3);}
+.domain-card.blue  .role-count{background:rgba(0,180,255,0.1);color:#00b4ff;border:1px solid rgba(0,180,255,0.3);}
+.domain-card.purple .role-count{background:rgba(168,85,247,0.1);color:#a855f7;border:1px solid rgba(168,85,247,0.3);}
+.domain-card.green .role-count{background:rgba(0,229,180,0.1);color:#00e5b4;border:1px solid rgba(0,229,180,0.3);}
+
+.card-divider{height:1px;margin:0 16px;}
+.domain-card.red   .card-divider{background:linear-gradient(90deg,transparent,rgba(255,62,108,0.35),transparent);}
+.domain-card.blue  .card-divider{background:linear-gradient(90deg,transparent,rgba(0,180,255,0.35),transparent);}
+.domain-card.purple .card-divider{background:linear-gradient(90deg,transparent,rgba(168,85,247,0.35),transparent);}
+.domain-card.green .card-divider{background:linear-gradient(90deg,transparent,rgba(0,229,180,0.35),transparent);}
+
+.roles-list{padding:12px 14px 10px;display:flex;flex-direction:column;gap:5px;flex:1;}
+.role-item{
+  display:flex;align-items:flex-start;gap:9px;
+  padding:8px 11px;border-radius:7px;font-size:13px;font-weight:500;line-height:1.35;letter-spacing:0.3px;
+  transition:background 0.2s,transform 0.2s;position:relative;overflow:hidden;
+}
+.role-item::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;border-radius:2px 0 0 2px;opacity:0;transition:opacity 0.2s;}
+.role-item:hover::before{opacity:1;}
+.domain-card.red   .role-item{background:rgba(255,62,108,0.04);color:#fcd7df;}
+.domain-card.blue  .role-item{background:rgba(0,180,255,0.04);color:#bae6fd;}
+.domain-card.purple .role-item{background:rgba(168,85,247,0.04);color:#ede9fe;}
+.domain-card.green .role-item{background:rgba(0,229,180,0.04);color:#d1fae5;}
+.domain-card.red   .role-item:hover{background:rgba(255,62,108,0.1);transform:translateX(3px);}
+.domain-card.blue  .role-item:hover{background:rgba(0,180,255,0.1);transform:translateX(3px);}
+.domain-card.purple .role-item:hover{background:rgba(168,85,247,0.1);transform:translateX(3px);}
+.domain-card.green .role-item:hover{background:rgba(0,229,180,0.1);transform:translateX(3px);}
+.domain-card.red   .role-item::before{background:#ff3e6c;}
+.domain-card.blue  .role-item::before{background:#00b4ff;}
+.domain-card.purple .role-item::before{background:#a855f7;}
+.domain-card.green .role-item::before{background:#00e5b4;}
+.role-bullet{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-top:5px;}
+.domain-card.red   .role-bullet{background:#ff3e6c;box-shadow:0 0 5px rgba(255,62,108,0.6);}
+.domain-card.blue  .role-bullet{background:#00b4ff;box-shadow:0 0 5px rgba(0,180,255,0.6);}
+.domain-card.purple .role-bullet{background:#a855f7;box-shadow:0 0 5px rgba(168,85,247,0.6);}
+.domain-card.green .role-bullet{background:#00e5b4;box-shadow:0 0 5px rgba(0,229,180,0.6);}
+
+/* CLICK HINT */
+.click-hint{
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  font-family:'Orbitron',monospace;font-size:9px;letter-spacing:2px;
+  padding:11px;opacity:0.4;transition:opacity 0.25s;border-top:1px solid;margin-top:auto;
+}
+.domain-card:hover .click-hint{opacity:1;}
+.domain-card.red   .click-hint{border-color:rgba(255,62,108,0.2);color:#ff3e6c;}
+.domain-card.blue  .click-hint{border-color:rgba(0,180,255,0.2);color:#00b4ff;}
+.domain-card.purple .click-hint{border-color:rgba(168,85,247,0.2);color:#a855f7;}
+.domain-card.green .click-hint{border-color:rgba(0,229,180,0.2);color:#00e5b4;}
+
+/* CAREER PATH STRIP */
+.career-strip{
+  margin-top:52px;padding:28px 28px 28px;
+  background:var(--bg2);border:1px solid rgba(255,255,255,0.06);border-radius:16px;
+  animation:fadeUp 0.8s ease both 0.8s;
+}
+.career-strip-title{font-family:'Orbitron',monospace;font-size:11px;letter-spacing:3px;color:var(--text3);margin-bottom:20px;text-transform:uppercase;}
+.career-paths{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;}
+.career-path-item{
+  display:flex;align-items:flex-start;gap:12px;
+  padding:14px 16px;border-radius:10px;background:rgba(255,255,255,0.02);
+  border:1px solid rgba(255,255,255,0.05);
+}
+.career-path-icon{font-size:22px;flex-shrink:0;margin-top:1px;}
+.career-path-title{font-family:'Orbitron',monospace;font-size:11px;font-weight:700;margin-bottom:5px;letter-spacing:0.5px;}
+.career-path-desc{font-size:12px;color:var(--text2);line-height:1.55;}
+
+/* ANIMATIONS */
+@keyframes fadeDown{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
+
+/* FOOTER */
+.footer{text-align:center;margin-top:52px;font-family:'Orbitron',monospace;font-size:10px;letter-spacing:3px;color:rgba(148,163,184,0.35);}
+
+/* MOBILE */
+@media(max-width:480px){
+  .countdown-card{padding:14px 16px;gap:14px;}
+  .countdown-num{font-size:22px;}
+  .center-box{padding:16px 28px;font-size:11px;}
+  .page-wrap{padding:24px 16px 60px;}
+}
+</style>
+</head>
+<body>
+<canvas id="canvas-bg"></canvas>
+<div class="scan-line"></div>
+<div class="page-wrap">
+
+  <div class="header">
+    <div class="header-badge">&#9632; Cybersecurity Career Paths &#9632;</div>
+    <h1>Cybersecurity Roadmap</h1>
+    <p>Four Core Domains &nbsp;&bull;&nbsp; 48 Specialization Roles &nbsp;&bull;&nbsp; Full Career Coverage</p>
+  </div>
+
+  <!-- WORKSHOP COUNTDOWN -->
+  <div class="countdown-wrap">
+    <div class="countdown-card">
+      <div class="workshop-tag">
+        <div class="live-dot"></div>
+        <span>WORKSHOP COUNTDOWN</span>
+      </div>
+      <div class="countdown-units">
+        <div class="countdown-unit">
+          <div class="countdown-label">DAYS</div>
+          <span class="countdown-num" id="cd-days">00</span>
+          <div class="countdown-unit-label">days</div>
+        </div>
+        <div class="countdown-sep">:</div>
+        <div class="countdown-unit">
+          <div class="countdown-label">HRS</div>
+          <span class="countdown-num" id="cd-hours">00</span>
+          <div class="countdown-unit-label">hours</div>
+        </div>
+        <div class="countdown-sep">:</div>
+        <div class="countdown-unit">
+          <div class="countdown-label">MIN</div>
+          <span class="countdown-num" id="cd-mins">00</span>
+          <div class="countdown-unit-label">mins</div>
+        </div>
+        <div class="countdown-sep">:</div>
+        <div class="countdown-unit">
+          <div class="countdown-label">SEC</div>
+          <span class="countdown-num" id="cd-secs">00</span>
+          <div class="countdown-unit-label">secs</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-strip">
+    <div class="stat-pill"><span class="stat-pill-num" style="color:#ff3e6c">12</span><span class="stat-pill-label">Red Team Roles</span></div>
+    <div class="stat-pill"><span class="stat-pill-num" style="color:#00b4ff">14</span><span class="stat-pill-label">Blue Team Roles</span></div>
+    <div class="stat-pill"><span class="stat-pill-num" style="color:#a855f7">10</span><span class="stat-pill-label">Purple Team Roles</span></div>
+    <div class="stat-pill"><span class="stat-pill-num" style="color:#00e5b4">12</span><span class="stat-pill-label">GRC Roles</span></div>
+    <div class="stat-pill"><span class="stat-pill-num">48</span><span class="stat-pill-label">Total Specializations</span></div>
+  </div>
+
+  <div class="center-node">
+    <div class="center-box">&#9670;&nbsp;&nbsp;CYBERSECURITY CORE&nbsp;&nbsp;&#9670;</div>
+  </div>
+  <div class="connector-area"><svg id="connector-svg"></svg></div>
+
+  <div class="domain-grid" id="domain-grid">
+
+    <!-- RED TEAM -->
+    <div class="domain-card red" onclick="location.href='red_team.html'">
+      <div class="card-inner">
+        <div class="domain-header">
+          <div class="role-count">12</div>
+          <div class="domain-icon">&#128482;</div>
+          <div class="domain-tag">Offensive</div>
+          <div class="domain-title">Red Team</div>
+          <div class="domain-subtitle">Offensive Security</div>
+        </div>
+        <div class="card-divider"></div>
+        <div class="roles-list">
+          <div class="role-item"><span class="role-bullet"></span>Web Application Penetration Testing</div>
+          <div class="role-item"><span class="role-bullet"></span>Network Penetration Testing</div>
+          <div class="role-item"><span class="role-bullet"></span>Mobile Application Penetration Testing</div>
+          <div class="role-item"><span class="role-bullet"></span>API Security Testing</div>
+          <div class="role-item"><span class="role-bullet"></span>Cloud Penetration Testing</div>
+          <div class="role-item"><span class="role-bullet"></span>Active Directory / Internal Network Attacks</div>
+          <div class="role-item"><span class="role-bullet"></span>Wireless (Wi-Fi) Security Testing</div>
+          <div class="role-item"><span class="role-bullet"></span>Social Engineering (Phishing, Human Attacks)</div>
+          <div class="role-item"><span class="role-bullet"></span>Exploit Development</div>
+          <div class="role-item"><span class="role-bullet"></span>Malware Development (Advanced Red Team)</div>
+          <div class="role-item"><span class="role-bullet"></span>Hardware / IoT / Embedded Device Hacking</div>
+          <div class="role-item"><span class="role-bullet"></span>Red Team Operations (Full-scope Simulation)</div>
+        </div>
+        <div class="click-hint">&#9656;&nbsp; EXPLORE ALL 12 ROLES</div>
+      </div>
+    </div>
+
+    <!-- BLUE TEAM -->
+    <div class="domain-card blue" onclick="location.href='blue_team.html'">
+      <div class="card-inner">
+        <div class="domain-header">
+          <div class="role-count">14</div>
+          <div class="domain-icon">&#128737;</div>
+          <div class="domain-tag">Defensive</div>
+          <div class="domain-title">Blue Team</div>
+          <div class="domain-subtitle">Defensive Security</div>
+        </div>
+        <div class="card-divider"></div>
+        <div class="roles-list">
+          <div class="role-item"><span class="role-bullet"></span>Security Operations Center (SOC Analyst)</div>
+          <div class="role-item"><span class="role-bullet"></span>Threat Detection &amp; Monitoring</div>
+          <div class="role-item"><span class="role-bullet"></span>Incident Response</div>
+          <div class="role-item"><span class="role-bullet"></span>Digital Forensics</div>
+          <div class="role-item"><span class="role-bullet"></span>Threat Hunting</div>
+          <div class="role-item"><span class="role-bullet"></span>Malware Analysis</div>
+          <div class="role-item"><span class="role-bullet"></span>SIEM (Security Info &amp; Event Management)</div>
+          <div class="role-item"><span class="role-bullet"></span>Endpoint Security (EDR/XDR)</div>
+          <div class="role-item"><span class="role-bullet"></span>Network Security Monitoring</div>
+          <div class="role-item"><span class="role-bullet"></span>Vulnerability Management</div>
+          <div class="role-item"><span class="role-bullet"></span>Patch Management</div>
+          <div class="role-item"><span class="role-bullet"></span>Identity &amp; Access Management (IAM)</div>
+          <div class="role-item"><span class="role-bullet"></span>Security Compliance Monitoring</div>
+          <div class="role-item"><span class="role-bullet"></span>Email Security &amp; Phishing Detection</div>
+        </div>
+        <div class="click-hint">&#9656;&nbsp; EXPLORE ALL 14 ROLES</div>
+      </div>
+    </div>
+
+    <!-- PURPLE TEAM -->
+    <div class="domain-card purple" onclick="location.href='purple_team.html'">
+      <div class="card-inner">
+        <div class="domain-header">
+          <div class="role-count">10</div>
+          <div class="domain-icon">&#128640;</div>
+          <div class="domain-tag">Collaborative</div>
+          <div class="domain-title">Purple Team</div>
+          <div class="domain-subtitle">Red + Blue Synergy</div>
+        </div>
+        <div class="card-divider"></div>
+        <div class="roles-list">
+          <div class="role-item"><span class="role-bullet"></span>Red Team &amp; Blue Team Collaboration</div>
+          <div class="role-item"><span class="role-bullet"></span>Attack Simulation &amp; Validation</div>
+          <div class="role-item"><span class="role-bullet"></span>Detection Engineering</div>
+          <div class="role-item"><span class="role-bullet"></span>Threat Emulation (MITRE ATT&amp;CK Based)</div>
+          <div class="role-item"><span class="role-bullet"></span>Security Control Testing</div>
+          <div class="role-item"><span class="role-bullet"></span>Adversary Simulation (Real-world Scenarios)</div>
+          <div class="role-item"><span class="role-bullet"></span>Detection Tuning &amp; Optimization</div>
+          <div class="role-item"><span class="role-bullet"></span>Gap Analysis (Identify Security Weaknesses)</div>
+          <div class="role-item"><span class="role-bullet"></span>Continuous Security Improvement</div>
+          <div class="role-item"><span class="role-bullet"></span>Security Automation &amp; Playbooks (SOAR)</div>
+        </div>
+        <div class="click-hint">&#9656;&nbsp; EXPLORE ALL 10 ROLES</div>
+      </div>
+    </div>
+
+    <!-- GRC -->
+    <div class="domain-card green" onclick="location.href='grc.html'">
+      <div class="card-inner">
+        <div class="domain-header">
+          <div class="role-count">12</div>
+          <div class="domain-icon">&#9878;</div>
+          <div class="domain-tag">Governance</div>
+          <div class="domain-title">GRC</div>
+          <div class="domain-subtitle">Governance, Risk &amp; Compliance</div>
+        </div>
+        <div class="card-divider"></div>
+        <div class="roles-list">
+          <div class="role-item"><span class="role-bullet"></span>Security Governance (Policies &amp; Frameworks)</div>
+          <div class="role-item"><span class="role-bullet"></span>Risk Management (Assessment &amp; Treatment)</div>
+          <div class="role-item"><span class="role-bullet"></span>Compliance (ISO 27001, NIST, GDPR)</div>
+          <div class="role-item"><span class="role-bullet"></span>Security Auditing</div>
+          <div class="role-item"><span class="role-bullet"></span>Third-Party / Vendor Risk Management</div>
+          <div class="role-item"><span class="role-bullet"></span>Business Continuity Planning (BCP)</div>
+          <div class="role-item"><span class="role-bullet"></span>Disaster Recovery (DR)</div>
+          <div class="role-item"><span class="role-bullet"></span>Data Protection &amp; Privacy</div>
+          <div class="role-item"><span class="role-bullet"></span>Identity Governance (IGA)</div>
+          <div class="role-item"><span class="role-bullet"></span>Legal &amp; Regulatory Requirements</div>
+          <div class="role-item"><span class="role-bullet"></span>Security Awareness &amp; Training</div>
+          <div class="role-item"><span class="role-bullet"></span>Policy &amp; Procedure Management</div>
+        </div>
+        <div class="click-hint">&#9656;&nbsp; EXPLORE ALL 12 ROLES</div>
+      </div>
+    </div>
+
+  </div><!-- /domain-grid -->
+
+  <!-- CAREER PATH GUIDE -->
+  <div class="career-strip">
+    <div class="career-strip-title">&#9632; Suggested Career Entry Points</div>
+    <div class="career-paths">
+      <div class="career-path-item">
+        <div class="career-path-icon">&#127919;</div>
+        <div>
+          <div class="career-path-title" style="color:#00b4ff">Start Here — Blue Team</div>
+          <div class="career-path-desc">SOC Analyst is the most common entry point. Learn log analysis, alert triage, and SIEM platforms first before branching into specializations.</div>
+        </div>
+      </div>
+      <div class="career-path-item">
+        <div class="career-path-icon">&#9876;</div>
+        <div>
+          <div class="career-path-title" style="color:#ff3e6c">Offensive Path — Red Team</div>
+          <div class="career-path-desc">Start with Web App Pentesting or Network Pentesting. Earn CEH, eJPT, or OSCP certifications. Bug bounty is a great practice ground.</div>
+        </div>
+      </div>
+      <div class="career-path-item">
+        <div class="career-path-icon">&#9889;</div>
+        <div>
+          <div class="career-path-title" style="color:#a855f7">Advanced Path — Purple Team</div>
+          <div class="career-path-desc">Requires experience in both Red and Blue. Focus on Detection Engineering and MITRE ATT&CK framework mastery after 2–3 years in either team.</div>
+        </div>
+      </div>
+      <div class="career-path-item">
+        <div class="career-path-icon">&#128200;</div>
+        <div>
+          <div class="career-path-title" style="color:#00e5b4">Management Path — GRC</div>
+          <div class="career-path-desc">Ideal for those with business + security interest. CISM, CISA, ISO 27001 Lead Auditor are key certs. Great salary and work-life balance.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">&#9632; Cybersecurity Workshop &nbsp;&#9632;&nbsp; 4 Domains &nbsp;&#9632;&nbsp; 48 Roles &#9632;</div>
+</div>
+
+<script>
+/* CANVAS BACKGROUND */
+const canvas=document.getElementById('canvas-bg'),ctx=canvas.getContext('2d');
+let W,H,pts=[];
+function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;}
+resize();
+window.addEventListener('resize',()=>{resize();initPts();});
+function initPts(){
+  pts=[];
+  const n=Math.floor((W*H)/13000);
+  for(let i=0;i<n;i++)pts.push({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.5+0.4,vx:(Math.random()-.5)*.26,vy:(Math.random()-.5)*.26,col:Math.random()>.5?'59,130,246':'139,92,246',a:Math.random()*.45+.18});
+}
+initPts();
+function drawGrid(){ctx.strokeStyle='rgba(59,130,246,0.05)';ctx.lineWidth=.5;for(let x=0;x<W;x+=60){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}for(let y=0;y<H;y+=60){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}}
+function frame(){
+  ctx.clearRect(0,0,W,H);drawGrid();
+  for(let i=0;i<pts.length;i++)for(let j=i+1;j<pts.length;j++){const dx=pts[i].x-pts[j].x,dy=pts[i].y-pts[j].y,d=Math.sqrt(dx*dx+dy*dy);if(d<115){ctx.beginPath();ctx.strokeStyle=`rgba(139,92,246,${.1*(1-d/115)})`;ctx.lineWidth=.5;ctx.moveTo(pts[i].x,pts[i].y);ctx.lineTo(pts[j].x,pts[j].y);ctx.stroke();}}
+  pts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0)p.x=W;if(p.x>W)p.x=0;if(p.y<0)p.y=H;if(p.y>H)p.y=0;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle=`rgba(${p.col},${p.a})`;ctx.fill();});
+  requestAnimationFrame(frame);
+}
+frame();
+
+/* CONNECTORS — FIX: uses fonts.ready to avoid layout shift */
+function drawConnectors(){
+  const svg=document.getElementById('connector-svg');
+  svg.innerHTML='';
+  const cb=document.querySelector('.center-box');
+  const grid=document.getElementById('domain-grid');
+  if(!cb||!grid)return;
+  const cards=grid.querySelectorAll('.domain-card');
+  const svgEl=svg.getBoundingClientRect();
+  const cbR=cb.getBoundingClientRect();
+  const cx=cbR.left+cbR.width/2-svgEl.left;
+  const cy=2;
+  const ty=svgEl.height-2;
+  const colors=['#ff3e6c','#00b4ff','#a855f7','#00e5b4'];
+  const durs=['1.4s','1.8s','2.1s','1.6s'];
+  const ns='http://www.w3.org/2000/svg';
+  cards.forEach((card,i)=>{
+    const cr=card.getBoundingClientRect();
+    const tx=cr.left+cr.width/2-svgEl.left;
+    const col=colors[i];
+    const line=document.createElementNS(ns,'line');
+    line.setAttribute('x1',cx);line.setAttribute('y1',cy);
+    line.setAttribute('x2',tx);line.setAttribute('y2',ty);
+    line.setAttribute('stroke',col);line.setAttribute('stroke-width','1.5');
+    line.setAttribute('stroke-opacity','0.5');line.setAttribute('stroke-dasharray','7 4');
+    const anim=document.createElementNS(ns,'animate');
+    anim.setAttribute('attributeName','stroke-dashoffset');
+    anim.setAttribute('from','0');anim.setAttribute('to','22');
+    anim.setAttribute('dur',durs[i]);anim.setAttribute('repeatCount','indefinite');
+    line.appendChild(anim);svg.appendChild(line);
+    [cy+3,ty-3].forEach((cy2,k)=>{
+      const d=document.createElementNS(ns,'circle');
+      d.setAttribute('cx',k===0?cx:tx);d.setAttribute('cy',cy2);d.setAttribute('r','3');
+      d.setAttribute('fill',col);d.setAttribute('opacity','0.85');svg.appendChild(d);
+    });
+  });
+}
+/* FIX: wait for fonts then draw */
+document.fonts.ready.then(()=>setTimeout(drawConnectors,80));
+window.addEventListener('resize',()=>setTimeout(drawConnectors,80));
+
+/* COUNTDOWN — targets next Sunday */
+function getNextSunday(){
+  const now=new Date();
+  const day=now.getDay();
+  const diff=day===0?7:(7-day);
+  const sun=new Date(now);
+  sun.setDate(now.getDate()+diff);
+  sun.setHours(9,0,0,0);
+  return sun;
+}
+function updateCountdown(){
+  const target=getNextSunday();
+  const now=new Date();
+  let diff=Math.max(0,target-now);
+  const days=Math.floor(diff/86400000);diff-=days*86400000;
+  const hrs=Math.floor(diff/3600000);diff-=hrs*3600000;
+  const mins=Math.floor(diff/60000);diff-=mins*60000;
+  const secs=Math.floor(diff/1000);
+  document.getElementById('cd-days').textContent=String(days).padStart(2,'0');
+  document.getElementById('cd-hours').textContent=String(hrs).padStart(2,'0');
+  document.getElementById('cd-mins').textContent=String(mins).padStart(2,'0');
+  document.getElementById('cd-secs').textContent=String(secs).padStart(2,'0');
+}
+updateCountdown();
+setInterval(updateCountdown,1000);
+</script>
+</body>
+</html>

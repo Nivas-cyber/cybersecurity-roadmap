@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Blue Team — Defensive Security — 14 roles explained for cybersecurity workshop.">
+<title>Blue Team — Defensive Security</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --accent:#00b4ff;
+  --accent-dim:rgba(0,180,255,0.1);
+  --accent-border:rgba(0,180,255,0.22);
+  --accent-border2:rgba(0,180,255,0.1);
+  --accent-border-hover:rgba(0,180,255,0.5);
+  --accent-light:#7dd3fc;
+  --accent-glow:rgba(0,180,255,0.35);
+  --accent-glow2:rgba(0,180,255,0.6);
+  --hero-gradient:linear-gradient(135deg,#7dd3fc 0%,#00b4ff 50%,#0070aa 100%);
+  --card-top-bg:linear-gradient(135deg,rgba(0,180,255,0.08) 0%,transparent 60%);
+  --card-hover-shadow:0 14px 55px rgba(0,180,255,0.2);
+  --divider-grad:linear-gradient(90deg,transparent,rgba(0,180,255,0.22),transparent);
+}
+/* ============ SHARED DOMAIN PAGE STYLES ============ */
+:root{
+  --bg:#050a14;--bg2:#0a1220;--bg3:#0d1828;
+  --text:#e2e8f0;--text2:#94a3b8;--text3:#475569;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;min-height:100vh;overflow-x:hidden;}
+#canvas-bg{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;opacity:0.28;}
+
+/* SCROLL PROGRESS */
+#scroll-bar{position:fixed;top:0;left:0;height:3px;width:0%;z-index:100;transition:width 0.1s;border-radius:0 2px 2px 0;}
+
+/* SCAN LINE */
+.scan-line{position:fixed;left:0;width:100%;height:2px;z-index:1;pointer-events:none;top:0;animation:scan 7s linear infinite;}
+@keyframes scan{0%{transform:translateY(-4px)}100%{transform:translateY(100vh)}}
+
+/* STICKY TOP NAV */
+.top-nav{
+  position:sticky;top:0;z-index:50;
+  background:rgba(5,10,20,0.9);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border-bottom:1px solid rgba(255,255,255,0.06);
+  padding:10px 24px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+}
+.nav-back{
+  display:inline-flex;align-items:center;gap:7px;
+  font-family:'Orbitron',monospace;font-size:10px;letter-spacing:2px;color:rgba(148,163,184,0.7);
+  text-decoration:none;padding:6px 14px;border:1px solid rgba(255,255,255,0.08);border-radius:20px;
+  transition:all 0.2s;background:rgba(255,255,255,0.02);white-space:nowrap;flex-shrink:0;
+}
+.nav-back:hover{color:#fff;border-color:rgba(255,255,255,0.25);}
+.nav-divider{color:rgba(255,255,255,0.12);font-size:16px;flex-shrink:0;}
+.nav-links{display:flex;gap:8px;flex-wrap:wrap;}
+.nav-link{
+  font-family:'Orbitron',monospace;font-size:9px;letter-spacing:1.5px;
+  padding:6px 14px;border-radius:20px;border:1px solid transparent;
+  text-decoration:none;transition:all 0.2s;white-space:nowrap;
+  color:rgba(148,163,184,0.6);background:rgba(255,255,255,0.02);
+}
+.nav-link:hover{color:#fff;background:rgba(255,255,255,0.05);}
+.nav-link.active{border-color:var(--accent);color:var(--accent);background:var(--accent-dim);}
+
+/* PAGE BODY */
+.page{position:relative;z-index:2;max-width:1400px;margin:0 auto;padding:40px 28px 80px;}
+
+/* HERO */
+.hero{margin-bottom:48px;animation:fadeDown 0.7s ease both;}
+.hero-tag{
+  display:inline-flex;align-items:center;gap:8px;
+  font-family:'Orbitron',monospace;font-size:10px;letter-spacing:3px;color:var(--accent);
+  border:1px solid var(--accent);padding:5px 16px;border-radius:30px;margin-bottom:20px;
+  box-shadow:0 0 16px var(--accent-glow);animation:badge-pulse 3s ease-in-out infinite;
+}
+@keyframes badge-pulse{0%,100%{box-shadow:0 0 16px var(--accent-glow)}50%{box-shadow:0 0 32px var(--accent-glow2)}}
+.hero-dot{width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent);animation:dot-blink 1.4s ease-in-out infinite;}
+@keyframes dot-blink{0%,100%{opacity:1}50%{opacity:0.25}}
+.hero h1{
+  font-family:'Orbitron',monospace;font-size:clamp(28px,5vw,56px);font-weight:900;letter-spacing:1px;
+  background:var(--hero-gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  line-height:1.1;margin-bottom:8px;
+}
+.hero-sub{font-size:17px;color:var(--text2);letter-spacing:0.8px;margin-bottom:18px;}
+.hero-desc{max-width:720px;font-size:15px;color:var(--text2);line-height:1.75;border-left:2px solid var(--accent);padding-left:18px;}
+
+/* STATS BAR */
+.stats-bar{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:44px;animation:fadeUp 0.7s ease both 0.2s;}
+.stat-chip{display:flex;align-items:center;gap:10px;background:var(--accent-dim);border:1px solid var(--accent-border);padding:10px 18px;border-radius:8px;}
+.stat-num{font-family:'Orbitron',monospace;font-size:20px;font-weight:700;color:var(--accent);}
+.stat-label{font-size:12px;color:var(--text2);letter-spacing:0.5px;line-height:1.3;}
+
+/* SEARCH BOX */
+.search-wrap{margin-bottom:28px;animation:fadeUp 0.7s ease both 0.3s;}
+.search-box{
+  width:100%;max-width:420px;
+  background:var(--bg2);border:1px solid var(--accent-border);border-radius:10px;
+  padding:11px 16px 11px 42px;font-family:'Rajdhani',sans-serif;font-size:14px;
+  color:var(--text);outline:none;transition:border-color 0.2s,box-shadow 0.2s;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%2364748b' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.867-3.834zm-5.242 1.406a5 5 0 1 1 0-10 5 5 0 0 1 0 10z'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:14px center;
+}
+.search-box:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim);}
+.search-box::placeholder{color:var(--text3);}
+.search-count{font-size:12px;color:var(--text3);margin-top:8px;letter-spacing:0.5px;}
+
+/* SECTION TITLE */
+.section-title{font-family:'Orbitron',monospace;font-size:12px;letter-spacing:3px;color:var(--accent);text-transform:uppercase;margin-bottom:22px;display:flex;align-items:center;gap:12px;}
+.section-title::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--accent-border),transparent);}
+
+/* ROLE GRID */
+.role-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(380px,1fr));gap:18px;}
+@media(max-width:500px){.role-grid{grid-template-columns:1fr;}}
+
+/* ROLE CARD */
+.role-card{
+  background:var(--bg2);border-radius:14px;overflow:hidden;
+  border:1px solid var(--accent-border2);
+  transition:transform 0.3s,box-shadow 0.3s,border-color 0.3s;
+  animation:fadeUp 0.6s ease both;
+}
+.role-card:hover{transform:translateY(-4px);box-shadow:var(--card-hover-shadow);border-color:var(--accent-border-hover);}
+.role-card-top{padding:18px 20px 14px;background:var(--card-top-bg);display:flex;align-items:flex-start;gap:12px;position:relative;}
+.role-number{font-family:'Orbitron',monospace;font-size:10px;font-weight:700;color:var(--accent);background:var(--accent-dim);border:1px solid var(--accent-border);padding:4px 8px;border-radius:6px;flex-shrink:0;margin-top:2px;}
+.role-title-wrap{flex:1;}
+.role-title{font-family:'Orbitron',monospace;font-size:12px;font-weight:700;color:var(--accent-light);line-height:1.4;letter-spacing:0.4px;margin-bottom:6px;}
+.diff-badge{display:inline-block;font-family:'Orbitron',monospace;font-size:8px;letter-spacing:1.5px;padding:2px 8px;border-radius:12px;text-transform:uppercase;font-weight:700;}
+.diff-beginner {background:rgba(0,229,180,0.12);color:#00e5b4;border:1px solid rgba(0,229,180,0.3);}
+.diff-intermediate{background:rgba(251,191,36,0.12);color:#fbbf24;border:1px solid rgba(251,191,36,0.3);}
+.diff-advanced {background:rgba(255,62,108,0.12);color:#ff3e6c;border:1px solid rgba(255,62,108,0.3);}
+.diff-expert   {background:rgba(168,85,247,0.12);color:#a855f7;border:1px solid rgba(168,85,247,0.3);}
+
+.role-divider{height:1px;background:var(--divider-grad);margin:0 20px;}
+.role-card-body{padding:16px 20px 14px;}
+.role-desc{font-size:14px;color:var(--text2);line-height:1.72;margin-bottom:14px;}
+.role-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:0;}
+.role-tag{font-size:11px;font-weight:600;letter-spacing:0.4px;background:var(--accent-dim);color:var(--accent-light);border:1px solid var(--accent-border);padding:3px 10px;border-radius:20px;}
+
+.what-section{padding:14px 20px 18px;}
+.what-title{font-size:10px;font-family:'Orbitron',monospace;letter-spacing:2px;color:var(--text3);margin-bottom:10px;text-transform:uppercase;}
+.what-list{list-style:none;display:flex;flex-direction:column;gap:7px;}
+.what-list li{display:flex;align-items:flex-start;gap:9px;font-size:13px;color:var(--text2);line-height:1.5;}
+.what-list li::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--accent);box-shadow:0 0 5px var(--accent);flex-shrink:0;margin-top:5px;}
+
+/* NO RESULTS */
+.no-results{text-align:center;padding:60px 20px;color:var(--text3);font-family:'Orbitron',monospace;font-size:12px;letter-spacing:2px;display:none;}
+
+/* CAREER TIPS */
+.tips-section{margin-top:52px;padding:24px 24px 28px;background:var(--bg2);border:1px solid rgba(255,255,255,0.06);border-radius:14px;animation:fadeUp 0.7s ease both 0.5s;}
+.tips-title{font-family:'Orbitron',monospace;font-size:11px;letter-spacing:3px;color:var(--text3);margin-bottom:18px;text-transform:uppercase;}
+.tips-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;}
+.tip-item{padding:14px 16px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.05);border-radius:10px;}
+.tip-label{font-family:'Orbitron',monospace;font-size:9px;letter-spacing:2px;color:var(--accent);margin-bottom:7px;text-transform:uppercase;}
+.tip-text{font-size:13px;color:var(--text2);line-height:1.6;}
+
+/* ANIMATIONS */
+@keyframes fadeDown{from{opacity:0;transform:translateY(-18px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
+
+.footer{text-align:center;margin-top:56px;font-family:'Orbitron',monospace;font-size:10px;letter-spacing:3px;color:rgba(148,163,184,0.3);}
+
+@media(max-width:640px){
+  .page{padding:28px 16px 60px;}
+  .top-nav{padding:8px 16px;}
+  .stats-bar{gap:8px;}
+  .stat-chip{padding:8px 12px;}
+  .stat-num{font-size:16px;}
+}
+
+.scan-line{background:linear-gradient(90deg,transparent,rgba(0,180,255,0.09),transparent);}
+#scroll-bar{background:#00b4ff;}
+</style>
+</head>
+<body>
+<canvas id="canvas-bg"></canvas>
+<div id="scroll-bar"></div>
+<div class="scan-line"></div>
+
+<!-- STICKY NAV -->
+<nav class="top-nav">
+  <a href="cybersecurity_roadmap.html" class="nav-back">&#8592; Roadmap</a>
+  <span class="nav-divider">|</span>
+  <div class="nav-links">
+    <a href="red_team.html" class="nav-link ">RED TEAM</a>
+<a href="blue_team.html" class="nav-link active">BLUE TEAM</a>
+<a href="purple_team.html" class="nav-link ">PURPLE TEAM</a>
+<a href="grc.html" class="nav-link ">GRC</a>
+
+  </div>
+</nav>
+
+<div class="page">
+
+  <div class="hero">
+    <div class="hero-tag"><div class="hero-dot"></div>DEFENSIVE SECURITY</div>
+    <h1>Blue Team</h1>
+    <p class="hero-sub">Detect. Defend. Respond. Protect.</p>
+    <p class="hero-desc">Blue Teamers are the guardians of the digital realm — cybersecurity professionals who monitor, detect, investigate, and respond to threats 24/7. They build and operate the controls, tools, and processes that keep organizations safe, turning attacker activity into actionable intelligence.</p>
+  </div>
+
+  <div class="stats-bar">
+    <div class="stat-chip"><div class="stat-num">14</div><div class="stat-label">Specialization Roles</div></div><div class="stat-chip"><div class="stat-num">VERY HIGH</div><div class="stat-label">Demand Level</div></div><div class="stat-chip"><div class="stat-num">DEFENSIVE</div><div class="stat-label">Domain Type</div></div><div class="stat-chip"><div class="stat-num">$60K–$160K</div><div class="stat-label">Salary Range (USD)</div></div>
+  </div>
+
+  <!-- SEARCH -->
+  <div class="search-wrap">
+    <input type="text" id="role-search" class="search-box" placeholder="Search roles, tools, skills...">
+    <div class="search-count" id="search-count">14 roles</div>
+  </div>
+
+  <div class="section-title">All 14 Roles — Fully Explained</div>
+
+  <div class="role-grid" id="role-grid">
+    
+    <div class="role-card">
+      <div class="role-card-top">
+        <span class="role-number">01</span>
+        <div class="role-title-wrap">
+          <div class="role-title">Security Operations Center (SOC Analyst)</div>
+          <span class="diff-badge diff-beginner">Beginner</span>
+        </div>
+      </div>
+      <div class="role-divider"></div>
+      <div class="role-card-body">
+        <p class="role-desc">SOC Analysts are the first line of defense, monitoring security alerts 24/7, triaging incidents, and investigating suspicious activity. Tier 1 handles initial alert triage; Tier 2 conducts deep investigation; Tier 3 leads threat hunting and complex incident response.</p>
+        <div class="role-tags"><span class="role-tag">Splunk</span><span class="role-tag">QRadar</span><span class="role-tag">Microsoft Sentinel</span><span class="role-tag">Alert Triage</span><span class="role-tag">SIEM</span></div>
+      </div>
+      <div class="role-divider"></div>
+      <div class="what-section">
+        <div class="what-title">What You Do Daily</div>
+        <ul class="what-list"><li>Monitor SIEM dashboards around the clock and investigate all triggered security alerts</li><li>Triage alerts quickly — distinguish true positives from false positives to reduce analyst fatigue</li><li>Investigate suspicious logins, malware detections, network anomalies, and data access events</li><li>Escalate confirmed incidents to Tier 2/IR teams with documented timeline and initial findings</li></ul>
+      </div>
+    </div>
+    <div class="role-card">
+      <div class="role-card-top">
+        <span class="role-number">02</span>
+        <div class="role-title-wrap">
+          <div class="role-title">Threat Detection & Monitoring</div>
+          <span class="diff-badge diff-intermediate">Intermediate</span>
+        </div>
+      </div>
+      <div class="role-divider"></div>
+      <div class="role-card-body">
+        <p class="role-desc">Threat Detection specialists build and maintain the detection logic powering the SOC. They write detection rules, configure alerts, tune SIEM platforms, and analyze telemetry across endpoints, networks, and cloud to surface attacker behaviors before damage is done.</p>
+        <div class="role-tags"><span class="role-tag">Sigma Rules</span><span class="role-tag">YARA</span><span class="role-tag">Elastic Stack</span><span class="role-tag">KQL</span><span class="role-tag">Chronicle</span></div>
+      </div>
+      <div class="role-divider"></div>
+      <div class="what-section">
+        <div class="what-title">What You Do Daily</div>
+        <ul class="what-list"><li>Write Sigma rules and SIEM queries to detect specific ATT&CK techniques in raw log data</li><li>Map current detection coverage against MITRE ATT&CK framework to identify blind spots</li><li>Tune alert thresholds and exceptions to reduce false positive noise without losing coverage</li><li>Analyze multi-source logs (firewall, AD, EDR, cloud) for correlated attack indicators</li></ul>
+      </div>
+    </div>
+    <div class="role-card">
+      <div class="role-card-top">
+        <span class="role-number">03</span>
+        <div class="role-title-wrap">
+          <div class="role-title">Incident Response</div>
+          <span class="diff-badge diff-intermediate">Intermediate</span>
+        </div>
+      </div>
+      <div class="role-divider"></div>
+      <div class="role-card-body">
+        <p class="role-desc">Incident Responders are called in when breaches happen. They contain active attacks, eradicate malware, investigate the full compromise scope, and restore systems — all under intense time pressure while following structured IR playbooks from containment through full recovery.</p>
+        <div class="role-tags"><span class="role-tag">DFIR</span><span class="role-tag">Volatility</span><span class="role-tag">FTK</span><span class="role-tag">NIST IR Framework</span><span class="role-tag">TheHive</span></div>
+      </div>
+      <div class="role-divider"></div>
+      <div class="what-section">
+        <div class="what-title">What You Do Daily</div>
+        <ul class="what-list"><li>Execute containment immediately — isolate infected hosts, block IPs, revoke compromised credentials</li><li>Perform memory and disk forensics to reconstruct attacker actions across the timeline</li><li>Identify patient zero and map the full lateral movement and persistence chain</li><li>Lead post-incident reviews and deliver comprehensive IR reports to technical and executive audiences</li></ul>
+      </div>
+    </div>
+    <div class="role-card">
+      <div class="role-card-top">
+        <span class="role-number">04</span>
+        <div class="role-title-wrap">
+          <div class="role-title">Digital Forensics</div>
+          <span class="diff-badge diff-intermediate">Intermediate</span>
+        </div>
+      </div>
+      <div class="role-divider"></div>
+      <div class="role-card-body">
+        <p class="role-desc">Digital Forensics analysts investigate evidence left by attackers, insider threats, or security incidents. They recover deleted files, analyze disk images, examine browser artifacts, registry hives, and volatile memory to reconstruct exactly what happened, when, and how.</p>
+        <div class="role-tags"><span class="role-tag">Autopsy</span><span class="role-tag">FTK Imager</span><span class="role-tag">Volatility</span><span class="role-tag">Sleuth Kit</span><span class="role-tag">KAPE</span></div>
+      </div>
+      <div class="role-divider"></div>
+      <div class="what-section">
+        <div class="what-title">What You Do Daily</div>
+        <ul class="what-list"><li>Create forensically sound disk images maintaining strict chain-of-custody documentation</li><li>Analyze Windows artifacts — prefetch, Amcache, registry, event logs, LNK files, NTFS journals</li><li>Recover deleted files and carve data from unallocated disk space with file carving tools</li><li>Analyze memory dumps for running processes, network connections, injected code, and credentials</li></ul>
+      </div>
+    </div>
+    <div class="role-card">
+      <div class="role-card-top">
+        <span class="role-number">05</span>
+        <div class="role-title-wrap">
+          <div class="role-title">Threat Hunting</div>
+          <span class="diff-badge diff-advanced">Advanced</span>
+        </div>
+      </div>
+      <div class="role-divider"></div>
+      <div class="role-card-body">
+        <p class="role-desc">Threat Hunters proactively search environments for hidden attackers that have evaded automated detection. Instead of waiting for alerts, they form hypotheses based on threat intelligence and ATT&CK TTPs, then manually investigate telemetry to uncover threats lurking in the environment.</p>
+        <div class="role-tags"><span class="role-tag">MITRE ATT&CK</span><span class="role-tag">Velociraptor</span><span class="role-tag">KQL</span><span class="role-tag">Threat Intel</span><span class="role-tag">OSQuery</span></div>
+      </div>
+      <div class="role-divider"></div>
+      <div class="what-section">
+        <div class="what-title">What You Do Daily</div>
+        <ul class="what-list"><li>Form and document threat hypotheses based on current threat intelligence and ATT&CK techniques</li><li>Hunt for suspicious parent-child process relationships and LOLBin (living-off-the-land) abuse</li><li>Search EDR telemetry for beacon-like C2 traffic patterns in DNS, HTTP, and HTTPS logs</li><li>Convert confirmed hunt findings into new SIEM detection rules to improve automated coverage</li></ul>
+      </div>
+    </div>
+    <div class="role-card">
+      <div class="role-card-top">
+        <span class="role-number">06</span>
+        <div class="role-title-wrap">
+          <div class="role-title">Malware Analysis</div>
+          <span class="diff-badge diff-advanced">Advanced</span>
+        </div>
+      </div>
+      <div class="role-divider"></div>
+      <div class="role-card-body">
+        <p class="role-desc">Malware Analysts dissect malicious software — ransomware, RATs, stealers, rootkits — to understand how they work, what they do, and how to detect and remove them. They combine static code inspection with dynamic sandbox analysis to extract IOCs and build detection signatures.</p>
+        <div class="role-tags"><span class="role-tag">IDA Pro</span><span class="role-tag">Ghidra</span><span class="role-tag">x64dbg</span><span class="role-tag">Cuckoo Sandbox</span><span class="role-tag">ANY.RUN</span></div>
+      </div>
+      <div class="role-divider"></div>
+      <div class="what-section">
+        <div class="what-title">What You Do Daily</div>
+        <ul class="what-list"><li>Perform static analysis: hash identification, YARA scanning, PE header inspection, string extraction</li><li>Execute malware in isolated sandboxes and document all behavioral indicators (file, registry, network)</li><li>Reverse-engineer obfuscated or packed malware using IDA Pro or Ghidra to understand core logic</li><li>Extract and share IOCs (IPs, domains, hashes, mutex names) for detection and threat intel enrichment</li></ul>
+      </div>
+    </div>
+    <div class="role-card">
+      <div class="role-card-top">
+        <span class="role-number">07</span>
+        <div class="role-title-wrap">
+          <div class="role-title">Security Information & Event Management (SIEM)</div>
+          <span class="diff-badge diff-intermediate">Intermediate</span>
+        </div>
+      </div>
+      <div class="role-divider"></div>
+      <div class="role-card-body">
+        <p class="role-desc">SIEM Engineers architect, deploy, and maintain the central logging and alerting platform that powers the entire SOC. They onboard log sources, write correlation rules, build dashboards, manage data retention policies, and ensure comprehensive visibility across the entire environment.</p>
+        <div class="role-tags"><span class="role-tag">Splunk</span><span class="role-tag">Microsoft Sentinel</span><span class="role-tag">Elastic SIEM</span><span class="role-tag">QRadar</span><span class="role-tag">LogRhythm</span></div>
+      </div>
+      <div class="role-divider"></div>
+      <div class="what-section">
+        <div class="what-title">What You Do Daily</div>
+        <ul class="what-list"><li>Onboard new log sources — firewalls, AD, EDR, cloud, endpoints — with proper field normalization</li><li>Write multi-source correlation rules to detect multi-stage attack patterns across log pipelines</li><li>Build SOC dashboards for real-time visibility into threats, alert volumes, and environment health</li><li>Tune rules continuously to maintain signal quality and manage SIEM storage and performance</li></ul>
+      </div>
+    </div>
+    <div class="role-card">
+      <div class="role-card-top">
+        <span class="role-number">08</span>
+        <div class="role-title-wrap">
+          <div class="role-title">Endpoint Security (EDR/XDR)</div>
+          <span class="diff-badge diff-intermediate">Intermediate</span>
+        </div>
+      </div>
+      <div class="role-divider"></div>
+      <div class="role-card-body">
+        <p class="role-desc">Endpoint Security specialists manage and operate EDR/XDR platforms deployed across all workstations and servers. They investigate endpoint alerts, analyze malicious process behavior, configure detection policies, and use rich telemetry for threat hunting and forensic investigations.</p>
+        <div class="role-tags"><span class="role-tag">CrowdStrike Falcon</span><span class="role-tag">SentinelOne</span><span class="role-tag">Microsoft Defender</span><span class="role-tag">Carbon Black</span><span class="role-tag">Cortex XDR</span></div>
+      </div>
+      <div class="role-divider"></div>
+      <div class="what-section">
+        <div class="what-title">What You Do Daily</div>
+        <ul class="what-list"><li>Investigate EDR process tree alerts — command-line arguments, file drops, network connections</li><li>Deploy and tune detection policies across thousands of endpoints while minimizing false positives</li><li>Use EDR telemetry to hunt for fileless malware, memory injection, and living-off-the-land attacks</li><li>Remotely isolate and remediate infected endpoints during active incidents to contain spread</li></ul>
+      </div>
+    </div>
+    <div class="role-card">
+      <div class="role-card-top">
+        <span class="role-number">09</span>
+        <div class="role-title-wrap">
+          <div class="role-title">Network Security Monitoring</div>
+          <span class="diff-badge diff-intermediate">Intermediate</span>
+        </div>
+      </div>
+      <div class="role-divider"></div>
+      <div class="role-card-body">
+        <p class="role-desc">Network Security Monitoring analysts watch all traffic for intrusion, exfiltration, lateral movement, and C2 communication. They use tools like Zeek, Suricata, and full packet capture to analyze flows and detect threats that endpoint tools miss.</p>
+        <div class="role-tags"><span class="role-tag">Zeek</span><span class="role-tag">Suricata</span><span class="role-tag">Wireshark</span><span class="role-tag">Security Onion</span><span class="role-tag">PCAP Analysis</span></div>
+      </div>
+      <div class="role-divider"></div>
+      <div class="what-section">
+        <div class="what-title">What You Do Daily</div>
+        <ul class="what-list"><li>Analyze NetFlow and full packet captures for anomalous traffic patterns and protocol abuse</li><li>Write custom Suricata/Snort IDS rules to detect known attack signatures and novel behaviors</li><li>Investigate beaconing patterns in DNS and HTTPS traffic indicating active C2 communication</li><li>Monitor for large/unusual data transfers that may signal active exfiltration campaigns</li></ul>
+      </div>
+    </div>
+    <div class="role-card">
+      <div class="role-card-top">
+        <span class="role-number">10</span>
+        <div class="role-title-wrap">
+          <div class="role-title">Vulnerability Management</div>
+          <span class="diff-badge diff-beginner">Beginner</span>
+        </div>
+      </div>
+      <div class="role-divider"></div>
+      <div class="role-card-body">
+        <p class="role-desc">Vulnerability Management analysts continuously scan infrastructure for known security flaws, prioritize them based on risk and exploitability, and track remediation to closure. They bridge security findings and IT teams who must implement patches and configuration fixes.</p>
+        <div class="role-tags"><span class="role-tag">Nessus</span><span class="role-tag">Qualys</span><span class="role-tag">Rapid7 InsightVM</span><span class="role-tag">CVSS Scoring</span><span class="role-tag">Tenable.io</span></div>
+      </div>
+      <div class="role-divider"></div>
+      <div class="what-section">
+        <div class="what-title">What You Do Daily</div>
+        <ul class="what-list"><li>Schedule and execute authenticated vulnerability scans across all asset classes regularly</li><li>Prioritize vulnerabilities by CVSS score, exploit availability, asset criticality, and exposure</li><li>Track remediation SLAs by asset owner and escalate overdue items to management</li><li>Validate successful remediation by rescanning fixed assets and updating the risk register</li></ul>
+      </div>
+    </div>
+    <div class="role-card">
+      <div class="role-card-top">
+        <span class="role-number">11</span>
+        <div class="role-title-wrap">
+          <div class="role-title">Patch Management</div>
+          <span class="diff-badge diff-beginner">Beginner</span>
+        </div>
+      </div>
+      <div class="role-divider"></div>
+      <div class="role-card-body">
+        <p class="role-desc">Patch Management specialists ensure software, OS, and firmware updates are systematically deployed across the entire organization. They maintain patching schedules, test patches in staging, emergency-patch critical CVEs, and report compliance metrics to security leadership.</p>
+        <div class="role-tags"><span class="role-tag">WSUS</span><span class="role-tag">SCCM / Intune</span><span class="role-tag">Ansible</span><span class="role-tag">Jamf</span><span class="role-tag">Patch Tuesday</span></div>
+      </div>
+      <div class="role-divider"></div>
+      <div class="what-section">
+        <div class="what-title">What You Do Daily</div>
+        <ul class="what-list"><li>Maintain a complete, current software and firmware inventory across all managed assets</li><li>Test patches in staging environments before production deployment to avoid service disruptions</li><li>Coordinate emergency patching for critical CVEs like Log4Shell and PrintNightmare within SLA</li><li>Track and report patch compliance rates and highlight unpatched critical assets to management</li></ul>
+      </div>
+    </div>
+    <div class="role-card">
+      <div class="role-card-top">
+        <span class="role-number">12</span>
+        <div class="role-title-wrap">
+          <div class="role-title">Identity & Access Management (IAM)</div>
+          <span class="diff-badge diff-intermediate">Intermediate</span>
+        </div>
+      </div>
+      <div class="role-divider"></div>
+      <div class="role-card-body">
+        <p class="role-desc">IAM specialists manage who has access to what across the enterprise — enforcing least privilege, managing the full user lifecycle, administering MFA and SSO, and operating Privileged Access Management (PAM) tools to secure high-value administrator accounts.</p>
+        <div class="role-tags"><span class="role-tag">Active Directory</span><span class="role-tag">Okta</span><span class="role-tag">CyberArk PAM</span><span class="role-tag">Azure AD / Entra</span><span class="role-tag">SailPoint</span></div>
+      </div>
+      <div class="role-divider"></div>
+      <div class="what-section">
+        <div class="what-title">What You Do Daily</div>
+        <ul class="what-list"><li>Manage user lifecycle — provisioning, deprovisioning, access reviews for joiners/movers/leavers</li><li>Enforce MFA and conditional access policies across all critical systems and cloud platforms</li><li>Monitor and secure privileged accounts with PAM tools, session recording, and just-in-time access</li><li>Detect and investigate anomalous account activity — off-hours logins, privilege escalation, lateral moves</li></ul>
+      </div>
+    </div>
+    <div class="role-card">
+      <div class="role-card-top">
+        <span class="role-number">13</span>
+        <div class="role-title-wrap">
+          <div class="role-title">Security Compliance Monitoring</div>
+          <span class="diff-badge diff-beginner">Beginner</span>
+        </div>
+      </div>
+      <div class="role-divider"></div>
+      <div class="role-card-body">
+        <p class="role-desc">Security Compliance Monitors ensure the organization continuously meets regulatory requirements and internal security policies. They audit controls, track compliance metrics, maintain audit evidence, and identify policy violations before formal external assessments find them first.</p>
+        <div class="role-tags"><span class="role-tag">ISO 27001</span><span class="role-tag">PCI DSS</span><span class="role-tag">NIST CSF</span><span class="role-tag">HIPAA</span><span class="role-tag">Audit Evidence</span></div>
+      </div>
+      <div class="role-divider"></div>
+      <div class="what-section">
+        <div class="what-title">What You Do Daily</div>
+        <ul class="what-list"><li>Monitor systems and configurations continuously for deviations from approved security baselines</li><li>Collect, organize, and maintain compliance evidence (logs, screenshots) throughout the year</li><li>Track remediation of audit findings with control owners and verify closure before re-assessment</li><li>Prepare compliance dashboards and status reports for CISO and audit committee presentations</li></ul>
+      </div>
+    </div>
+    <div class="role-card">
+      <div class="role-card-top">
+        <span class="role-number">14</span>
+        <div class="role-title-wrap">
+          <div class="role-title">Email Security & Phishing Detection</div>
+          <span class="diff-badge diff-beginner">Beginner</span>
+        </div>
+      </div>
+      <div class="role-divider"></div>
+      <div class="role-card-body">
+        <p class="role-desc">Email Security specialists protect the most-targeted attack vector in any organization. They manage email gateways, analyze reported phishing emails, build detection rules for new campaigns, implement anti-spoofing controls, and measure employee awareness through simulation campaigns.</p>
+        <div class="role-tags"><span class="role-tag">Proofpoint</span><span class="role-tag">Mimecast</span><span class="role-tag">Microsoft Defender</span><span class="role-tag">DMARC/SPF/DKIM</span><span class="role-tag">PhishMe</span></div>
+      </div>
+      <div class="role-divider"></div>
+      <div class="what-section">
+        <div class="what-title">What You Do Daily</div>
+        <ul class="what-list"><li>Analyze suspicious emails reported by employees — headers, links, attachments, sender reputation</li><li>Configure and fine-tune email gateway rules to block phishing, BEC, and spam at scale</li><li>Implement and monitor DMARC, DKIM, and SPF records to prevent domain spoofing and impersonation</li><li>Design and run monthly phishing simulation campaigns to measure and improve employee click rates</li></ul>
+      </div>
+    </div>
+    <div class="no-results" id="no-results">No roles match your search.</div>
+  </div>
+
+  <!-- CAREER TIPS -->
+  <div class="tips-section">
+    <div class="tips-title">&#9632; Career Tips &amp; Certifications</div>
+    <div class="tips-grid">
+      <div class="tip-item"><div class="tip-label">Entry Cert</div><div class="tip-text">CompTIA Security+ is the industry baseline. Follow with CySA+ for SOC/Blue Team specialization.</div></div><div class="tip-item"><div class="tip-label">First Lab</div><div class="tip-text">Build a home SOC lab: Elastic SIEM + Windows VM + Sysmon. Practice detecting simulated attacks.</div></div><div class="tip-item"><div class="tip-label">Key Platform</div><div class="tip-text">Learn Splunk deeply — it dominates enterprise SOCs. Free Splunk training at Splunk Education portal.</div></div><div class="tip-item"><div class="tip-label">Career Path</div><div class="tip-text">SOC Analyst → Tier 2 → Threat Hunter / Incident Responder → SOC Lead → CISO pathway.</div></div>
+    </div>
+  </div>
+
+  <div class="footer">&#9632; Blue Team — Defensive Security &#9632;</div>
+</div>
+
+<script>
+const GRID_COLOR='rgba(0,180,255,0.04)';
+const LINE_COLOR='0,180,255';
+const PT_COLOR='0,180,255';
+/* CANVAS */
+const canvas=document.getElementById('canvas-bg'),ctx=canvas.getContext('2d');
+let W,H,pts=[];
+function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;}
+resize();window.addEventListener('resize',()=>{resize();initPts();});
+function initPts(){pts=[];const n=Math.floor((W*H)/13500);for(let i=0;i<n;i++)pts.push({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.4+0.4,vx:(Math.random()-.5)*.25,vy:(Math.random()-.5)*.25,a:Math.random()*.42+.15});}
+initPts();
+function drawGrid(){ctx.strokeStyle=GRID_COLOR;ctx.lineWidth=.5;for(let x=0;x<W;x+=60){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}for(let y=0;y<H;y+=60){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}}
+function frame(){ctx.clearRect(0,0,W,H);drawGrid();for(let i=0;i<pts.length;i++)for(let j=i+1;j<pts.length;j++){const dx=pts[i].x-pts[j].x,dy=pts[i].y-pts[j].y,d=Math.sqrt(dx*dx+dy*dy);if(d<108){ctx.beginPath();ctx.strokeStyle=`rgba(${LINE_COLOR},${.09*(1-d/108)})`;ctx.lineWidth=.5;ctx.moveTo(pts[i].x,pts[i].y);ctx.lineTo(pts[j].x,pts[j].y);ctx.stroke();}}pts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0)p.x=W;if(p.x>W)p.x=0;if(p.y<0)p.y=H;if(p.y>H)p.y=0;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle=`rgba(${PT_COLOR},${p.a})`;ctx.fill();});requestAnimationFrame(frame);}
+frame();
+
+/* SCROLL PROGRESS */
+const bar=document.getElementById('scroll-bar');
+window.addEventListener('scroll',()=>{const pct=(window.scrollY/(document.documentElement.scrollHeight-window.innerHeight))*100;bar.style.width=Math.min(100,pct)+'%';},{ passive:true });
+
+/* SEARCH FILTER */
+const searchBox=document.getElementById('role-search');
+const cards=document.querySelectorAll('.role-card');
+const countEl=document.getElementById('search-count');
+const noRes=document.getElementById('no-results');
+function updateSearch(){
+  const q=searchBox.value.toLowerCase().trim();
+  let shown=0;
+  cards.forEach(c=>{
+    const text=c.textContent.toLowerCase();
+    const match=!q||text.includes(q);
+    c.style.display=match?'':'none';
+    if(match)shown++;
+  });
+  countEl.textContent=q?`Showing ${shown} of ${cards.length} roles`:`${cards.length} roles`;
+  noRes.style.display=(shown===0&&q)?'block':'none';
+}
+if(searchBox){searchBox.addEventListener('input',updateSearch);updateSearch();}
+
+</script>
+</body>
+</html>

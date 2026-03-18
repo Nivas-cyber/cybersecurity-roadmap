@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Red Team — Offensive Security — 12 roles explained for cybersecurity workshop.">
+<title>Red Team — Offensive Security</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --accent:#ff3e6c;
+  --accent-dim:rgba(255,62,108,0.12);
+  --accent-border:rgba(255,62,108,0.25);
+  --accent-border2:rgba(255,62,108,0.12);
+  --accent-border-hover:rgba(255,62,108,0.5);
+  --accent-light:#ff8fa3;
+  --accent-glow:rgba(255,62,108,0.35);
+  --accent-glow2:rgba(255,62,108,0.6);
+  --hero-gradient:linear-gradient(135deg,#ff8fa3 0%,#ff3e6c 50%,#c0102e 100%);
+  --card-top-bg:linear-gradient(135deg,rgba(255,62,108,0.08) 0%,transparent 60%);
+  --card-hover-shadow:0 14px 55px rgba(255,62,108,0.22);
+  --divider-grad:linear-gradient(90deg,transparent,rgba(255,62,108,0.22),transparent);
+}
+/* ============ SHARED DOMAIN PAGE STYLES ============ */
+:root{
+  --bg:#050a14;--bg2:#0a1220;--bg3:#0d1828;
+  --text:#e2e8f0;--text2:#94a3b8;--text3:#475569;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;min-height:100vh;overflow-x:hidden;}
+#canvas-bg{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;opacity:0.28;}
+
+/* SCROLL PROGRESS */
+#scroll-bar{position:fixed;top:0;left:0;height:3px;width:0%;z-index:100;transition:width 0.1s;border-radius:0 2px 2px 0;}
+
+/* SCAN LINE */
+.scan-line{position:fixed;left:0;width:100%;height:2px;z-index:1;pointer-events:none;top:0;animation:scan 7s linear infinite;}
+@keyframes scan{0%{transform:translateY(-4px)}100%{transform:translateY(100vh)}}
+
+/* STICKY TOP NAV */
+.top-nav{
+  position:sticky;top:0;z-index:50;
+  background:rgba(5,10,20,0.9);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border-bottom:1px solid rgba(255,255,255,0.06);
+  padding:10px 24px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+}
+.nav-back{
+  display:inline-flex;align-items:center;gap:7px;
+  font-family:'Orbitron',monospace;font-size:10px;letter-spacing:2px;color:rgba(148,163,184,0.7);
+  text-decoration:none;padding:6px 14px;border:1px solid rgba(255,255,255,0.08);border-radius:20px;
+  transition:all 0.2s;background:rgba(255,255,255,0.02);white-space:nowrap;flex-shrink:0;
+}
+.nav-back:hover{color:#fff;border-color:rgba(255,255,255,0.25);}
+.nav-divider{color:rgba(255,255,255,0.12);font-size:16px;flex-shrink:0;}
+.nav-links{display:flex;gap:8px;flex-wrap:wrap;}
+.nav-link{
+  font-family:'Orbitron',monospace;font-size:9px;letter-spacing:1.5px;
+  padding:6px 14px;border-radius:20px;border:1px solid transparent;
+  text-decoration:none;transition:all 0.2s;white-space:nowrap;
+  color:rgba(148,163,184,0.6);background:rgba(255,255,255,0.02);
+}
+.nav-link:hover{color:#fff;background:rgba(255,255,255,0.05);}
+.nav-link.active{border-color:var(--accent);color:var(--accent);background:var(--accent-dim);}
+
+/* PAGE BODY */
+.page{position:relative;z-index:2;max-width:1400px;margin:0 auto;padding:40px 28px 80px;}
+
+/* HERO */
+.hero{margin-bottom:48px;animation:fadeDown 0.7s ease both;}
+.hero-tag{
+  display:inline-flex;align-items:center;gap:8px;
+  font-family:'Orbitron',monospace;font-size:10px;letter-spacing:3px;color:var(--accent);
+  border:1px solid var(--accent);padding:5px 16px;border-radius:30px;margin-bottom:20px;
+  box-shadow:0 0 16px var(--accent-glow);animation:badge-pulse 3s ease-in-out infinite;
+}
+@keyframes badge-pulse{0%,100%{box-shadow:0 0 16px var(--accent-glow)}50%{box-shadow:0 0 32px var(--accent-glow2)}}
+.hero-dot{width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent);animation:dot-blink 1.4s ease-in-out infinite;}
+@keyframes dot-blink{0%,100%{opacity:1}50%{opacity:0.25}}
+.hero h1{
+  font-family:'Orbitron',monospace;font-size:clamp(28px,5vw,56px);font-weight:900;letter-spacing:1px;
+  background:var(--hero-gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  line-height:1.1;margin-bottom:8px;
+}
+.hero-sub{font-size:17px;color:var(--text2);letter-spacing:0.8px;margin-bottom:18px;}
+.hero-desc{max-width:720px;font-size:15px;color:var(--text2);line-height:1.75;border-left:2px solid var(--accent);padding-left:18px;}
+
+/* STATS BAR */
+.stats-bar{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:44px;animation:fadeUp 0.7s ease both 0.2s;}
+.stat-chip{display:flex;align-items:center;gap:10px;background:var(--accent-dim);border:1px solid var(--accent-border);padding:10px 18px;border-radius:8px;}
+.stat-num{font-family:'Orbitron',monospace;font-size:20px;font-weight:700;color:var(--accent);}
+.stat-label{font-size:12px;color:var(--text2);letter-spacing:0.5px;line-height:1.3;}
+
+/* SEARCH BOX */
+.search-wrap{margin-bottom:28px;animation:fadeUp 0.7s ease both 0.3s;}
+.search-box{
+  width:100%;max-width:420px;
+  background:var(--bg2);border:1px solid var(--accent-border);border-radius:10px;
+  padding:11px 16px 11px 42px;font-family:'Rajdhani',sans-serif;font-size:14px;
+  color:var(--text);outline:none;transition:border-color 0.2s,box-shadow 0.2s;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%2364748b' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.867-3.834zm-5.242 1.406a5 5 0 1 1 0-10 5 5 0 0 1 0 10z'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:14px center;
+}
+.search-box:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim);}
+.search-box::placeholder{color:var(--text3);}
+.search-count{font-size:12px;color:var(--text3);margin-top:8px;letter-spacing:0.5px;}
+
+/* SECTION TITLE */
+.section-title{font-family:'Orbitron',monospace;font-size:12px;letter-spacing:3px;color:var(--accent);text-transform:uppercase;margin-bottom:22px;display:flex;align-items:center;gap:12px;}
+.section-title::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--accent-border),transparent);}
+
+/* ROLE GRID */
+.role-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(380px,1fr));gap:18px;}
+@media(max-width:500px){.role-grid{grid-template-columns:1fr;}}
+
+/* ROLE CARD */
+.role-card{
+  background:var(--bg2);border-radius:14px;overflow:hidden;
+  border:1px solid var(--accent-border2);
+  transition:transform 0.3s,box-shadow 0.3s,border-color 0.3s;
+  animation:fadeUp 0.6s ease both;
+}
+.role-card:hover{transform:translateY(-4px);box-shadow:var(--card-hover-shadow);border-color:var(--accent-border-hover);}
+.role-card-top{padding:18px 20px 14px;background:var(--card-top-bg);display:flex;align-items:flex-start;gap:12px;position:relative;}
+.role-number{font-family:'Orbitron',monospace;font-size:10px;font-weight:700;color:var(--accent);background:var(--accent-dim);border:1px solid var(--accent-border);padding:4px 8px;border-radius:6px;flex-shrink:0;margin-top:2px;}
+.role-title-wrap{flex:1;}
+.role-title{font-family:'Orbitron',monospace;font-size:12px;font-weight:700;color:var(--accent-light);line-height:1.4;letter-spacing:0.4px;margin-bottom:6px;}
+.diff-badge{display:inline-block;font-family:'Orbitron',monospace;font-size:8px;letter-spacing:1.5px;padding:2px 8px;border-radius:12px;text-transform:uppercase;font-weight:700;}
+.diff-beginner {background:rgba(0,229,180,0.12);color:#00e5b4;border:1px solid rgba(0,229,180,0.3);}
+.diff-intermediate{background:rgba(251,191,36,0.12);color:#fbbf24;border:1px solid rgba(251,191,36,0.3);}
+.diff-advanced {background:rgba(255,62,108,0.12);color:#ff3e6c;border:1px solid rgba(255,62,108,0.3);}
+.diff-expert   {background:rgba(168,85,247,0.12);color:#a855f7;border:1px solid rgba(168,85,247,0.3);}
+
+.role-divider{height:1px;background:var(--divider-grad);margin:0 20px;}
+.role-card-body{padding:16px 20px 14px;}
+.role-desc{font-size:14px;color:var(--text2);line-height:1.72;margin-bottom:14px;}
+.role-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:0;}
+.role-tag{font-size:11px;font-weight:600;letter-spacing:0.4px;background:var(--accent-dim);color:var(--accent-light);border:1px solid var(--accent-border);padding:3px 10px;border-radius:20px;}
+
+.what-section{padding:14px 20px 18px;}
+.what-title{font-size:10px;font-family:'Orbitron',monospace;letter-spacing:2px;color:var(--text3);margin-bottom:10px;text-transform:uppercase;}
+.what-list{list-style:none;display:flex;flex-direction:column;gap:7px;}
+.what-list li{display:flex;align-items:flex-start;gap:9px;font-size:13px;color:var(--text2);line-height:1.5;}
+.what-list li::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--accent);box-shadow:0 0 5px var(--accent);flex-shrink:0;margin-top:5px;}
+
+/* NO RESULTS */
+.no-results{text-align:center;padding:60px 20px;color:var(--text3);font-family:'Orbitron',monospace;font-size:12px;letter-spacing:2px;display:none;}
+
+/* CAREER TIPS */
+.tips-section{margin-top:52px;padding:24px 24px 28px;background:var(--bg2);border:1px solid rgba(255,255,255,0.06);border-radius:14px;animation:fadeUp 0.7s ease both 0.5s;}
+.tips-title{font-family:'Orbitron',monospace;font-size:11px;letter-spacing:3px;color:var(--text3);margin-bottom:18px;text-transform:uppercase;}
+.tips-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;}
+.tip-item{padding:14px 16px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.05);border-radius:10px;}
+.tip-label{font-family:'Orbitron',monospace;font-size:9px;letter-spacing:2px;color:var(--accent);margin-bottom:7px;text-transform:uppercase;}
+.tip-text{font-size:13px;color:var(--text2);line-height:1.6;}
+
+/* ANIMATIONS */
+@keyframes fadeDown{from{opacity:0;transform:translateY(-18px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
+
+.footer{text-align:center;margin-top:56px;font-family:'Orbitron',monospace;font-size:10px;letter-spacing:3px;color:rgba(148,163,184,0.3);}
+
+@media(max-width:640px){
+  .page{padding:28px 16px 60px;}
+  .top-nav{padding:8px 16px;}
+  .stats-bar{gap:8px;}
+  .stat-chip{padding:8px 12px;}
+  .stat-num{font-size:16px;}
+}
+
+.scan-line{background:linear-gradient(90deg,transparent,rgba(255,62,108,0.1),transparent);}
+#scroll-bar{background:#ff3e6c;}
+</style>
+</head>
+<body>
+<canvas id="canvas-bg"></canvas>
+<div id="scroll-bar"></div>
+<div class="scan-line"></div>
+
+<!-- STICKY NAV -->
+<nav class="top-nav">
+  <a href="cybersecurity_roadmap.html" class="nav-back">&#8592; Roadmap</a>
+  <span class="nav-divider">|</span>
+  <div class="nav-links">
+    <a href="red_team.html" class="nav-link active">RED TEAM</a>
+<a href="blue_team.html" class="nav-link ">BLUE TEAM</a>
+<a href="purple_team.html" class="nav-link ">PURPLE TEAM</a>
+<a href="grc.html" class="nav-link ">GRC</a>
+
+  </div>
+</nav>
+
+<div class="page">
+
+  <div class="hero">
+    <div class="hero-tag"><div class="hero-dot"></div>OFFENSIVE SECURITY</div>
+    <h1>Red Team</h1>
+    <p class="hero-sub">Attack. Exploit. Simulate. Strengthen.</p>
+    <p class="hero-desc">Red Teamers are the ethical adversaries — cybersecurity professionals who think, act, and operate like real-world attackers. Their mission is to probe defenses, find weaknesses before real hackers do, and help organizations build stronger security postures through realistic attack simulation.</p>
+  </div>
+
+  <div class="stats-bar">
+    <div class="stat-chip"><div class="stat-num">12</div><div class="stat-label">Specialization Roles</div></div><div class="stat-chip"><div class="stat-num">HIGH</div><div class="stat-label">Demand Level</div></div><div class="stat-chip"><div class="stat-num">OFFENSIVE</div><div class="stat-label">Domain Type</div></div><div class="stat-chip"><div class="stat-num">$80K–$180K</div><div class="stat-label">Salary Range (USD)</div></div>
+  </div>
+
+  <!-- SEARCH -->
+  <div class="search-wrap">
+    <input type="text" id="role-search" class="search-box" placeholder="Search roles, tools, skills...">
+    <div class="search-count" id="search-count">12 roles</div>
+  </div>
+
+  <div class="section-title">All 12 Roles — Fully Explained</div>
+
+  <div class="role-grid" id="role-grid">
+    
+    <div class="role-card">
+      <div class="role-card-top">
+        <span class="role-number">01</span>
+        <div class="role-title-wrap">
+          <div class="role-title">Web Application Penetration Testing</div>
+          <span class="diff-badge diff-intermediate">Intermediate</span>
+        </div>
+      </div>
+      <div class="role-divider"></div>
+      <div class="role-card-body">
+        <p class="role-desc">Web App Pentesters attack websites and web applications to find vulnerabilities that real hackers could exploit. They test for SQL injection, XSS, authentication flaws, insecure APIs, business logic errors, and broken access controls using both automated tools and deep manual techniques.</p>
+        <div class="role-tags"><span class="role-tag">OWASP Top 10</span><span class="role-tag">Burp Suite</span><span class="role-tag">SQLmap</span><span class="role-tag">OWASP ZAP</span><span class="role-tag">Nmap</span></div>
+      </div>
+      <div class="role-divider"></div>
+      <div class="what-section">
+        <div class="what-title">What You Do Daily</div>
+        <ul class="what-list"><li>Test login pages for authentication bypass, brute-force, and session fixation</li><li>Inject malicious SQL/XSS payloads to test input sanitization across all parameters</li><li>Map the full attack surface — endpoints, parameters, cookies, hidden fields, headers</li><li>Write detailed reports with proof-of-concept exploits and prioritized remediation steps</li></ul>
+      </div>
+    </div>
+    <div class="role-card">
+      <div class="role-card-top">
+        <span class="role-number">02</span>
+        <div class="role-title-wrap">
+          <div class="role-title">Network Penetration Testing</div>
+          <span class="diff-badge diff-intermediate">Intermediate</span>
+        </div>
+      </div>
+      <div class="role-divider"></div>
+      <div class="role-card-body">
+        <p class="role-desc">Network Pentesters attack the infrastructure layer — routers, firewalls, switches, servers, and services. They scan for open ports, exploit weak protocols, perform man-in-the-middle attacks, test network segmentation, and identify misconfigurations that expose internal systems.</p>
+        <div class="role-tags"><span class="role-tag">Nmap</span><span class="role-tag">Metasploit</span><span class="role-tag">Wireshark</span><span class="role-tag">Nessus</span><span class="role-tag">Responder</span></div>
+      </div>
+      <div class="role-divider"></div>
+      <div class="what-section">
+        <div class="what-title">What You Do Daily</div>
+        <ul class="what-list"><li>Perform port scanning and service enumeration to fully map network topology</li><li>Exploit known CVEs in exposed services like SMB, RDP, FTP, and SSH</li><li>Conduct ARP spoofing, DNS poisoning, and MITM attacks in test environments</li><li>Test firewall ACLs and network segmentation controls for bypass opportunities</li></ul>
+      </div>
+    </div>
+    <div class="role-card">
+      <div class="role-card-top">
+        <span class="role-number">03</span>
+        <div class="role-title-wrap">
+          <div class="role-title">Mobile Application Penetration Testing</div>
+          <span class="diff-badge diff-intermediate">Intermediate</span>
+        </div>
+      </div>
+      <div class="role-divider"></div>
+      <div class="role-card-body">
+        <p class="role-desc">Mobile App Pentesters analyze iOS and Android applications for security flaws. They reverse-engineer apps, intercept mobile traffic, examine local data storage, test authentication logic, and probe backend APIs — covering both the client app and its server-side attack surface.</p>
+        <div class="role-tags"><span class="role-tag">Frida</span><span class="role-tag">MobSF</span><span class="role-tag">Jadx</span><span class="role-tag">Apktool</span><span class="role-tag">Android Studio</span></div>
+      </div>
+      <div class="role-divider"></div>
+      <div class="what-section">
+        <div class="what-title">What You Do Daily</div>
+        <ul class="what-list"><li>Decompile APKs and IPAs to inspect source code for hardcoded secrets and keys</li><li>Use Frida to hook runtime functions and bypass SSL pinning and root detection</li><li>Test insecure local data storage — cleartext passwords, sensitive SharedPreferences</li><li>Analyze all backend API calls for broken authorization, IDOR, and injection flaws</li></ul>
+      </div>
+    </div>
+    <div class="role-card">
+      <div class="role-card-top">
+        <span class="role-number">04</span>
+        <div class="role-title-wrap">
+          <div class="role-title">API Security Testing</div>
+          <span class="diff-badge diff-intermediate">Intermediate</span>
+        </div>
+      </div>
+      <div class="role-divider"></div>
+      <div class="role-card-body">
+        <p class="role-desc">API Security Testers specialize in attacking REST, GraphQL, SOAP, and gRPC interfaces. With modern apps heavily API-driven, they focus on broken object-level authorization (BOLA/IDOR), mass assignment, excessive data exposure, JWT attacks, and rate-limiting failures.</p>
+        <div class="role-tags"><span class="role-tag">Postman</span><span class="role-tag">Burp Suite</span><span class="role-tag">OWASP API Top 10</span><span class="role-tag">GraphQL</span><span class="role-tag">jwt_tool</span></div>
+      </div>
+      <div class="role-divider"></div>
+      <div class="what-section">
+        <div class="what-title">What You Do Daily</div>
+        <ul class="what-list"><li>Fuzz API endpoints for IDOR — access other users' data by manipulating IDs</li><li>Test JWT tokens for algorithm confusion, weak secrets, and none-algorithm attacks</li><li>Check for excessive data exposure — APIs returning more fields than the UI displays</li><li>Test GraphQL for introspection abuse, batch attacks, and field-level authorization</li></ul>
+      </div>
+    </div>
+    <div class="role-card">
+      <div class="role-card-top">
+        <span class="role-number">05</span>
+        <div class="role-title-wrap">
+          <div class="role-title">Cloud Penetration Testing</div>
+          <span class="diff-badge diff-advanced">Advanced</span>
+        </div>
+      </div>
+      <div class="role-divider"></div>
+      <div class="role-card-body">
+        <p class="role-desc">Cloud Pentesters attack AWS, Azure, and GCP environments. They find misconfigured S3 buckets, overprivileged IAM roles, exposed cloud functions, insecure storage accounts, and cloud-native privilege escalation paths — including attacks through metadata services and SSRF.</p>
+        <div class="role-tags"><span class="role-tag">AWS / Azure / GCP</span><span class="role-tag">Pacu</span><span class="role-tag">ScoutSuite</span><span class="role-tag">CloudSploit</span><span class="role-tag">Prowler</span></div>
+      </div>
+      <div class="role-divider"></div>
+      <div class="what-section">
+        <div class="what-title">What You Do Daily</div>
+        <ul class="what-list"><li>Enumerate IAM permissions and escalate privileges through misconfigured roles and policies</li><li>Find publicly exposed S3 buckets and storage accounts leaking sensitive data</li><li>Attack cloud metadata endpoints (169.254.169.254) to steal instance credentials via SSRF</li><li>Test Lambda/Azure Functions and container workloads for injection and misconfigurations</li></ul>
+      </div>
+    </div>
+    <div class="role-card">
+      <div class="role-card-top">
+        <span class="role-number">06</span>
+        <div class="role-title-wrap">
+          <div class="role-title">Active Directory / Internal Network Attacks</div>
+          <span class="diff-badge diff-advanced">Advanced</span>
+        </div>
+      </div>
+      <div class="role-divider"></div>
+      <div class="role-card-body">
+        <p class="role-desc">AD Attack specialists target Windows enterprise environments — the backbone of most corporate networks. They perform Kerberoasting, Pass-the-Hash, DCSync, LDAP enumeration, BloodHound graph analysis, and work towards Domain Admin access through lateral movement chains.</p>
+        <div class="role-tags"><span class="role-tag">BloodHound</span><span class="role-tag">Mimikatz</span><span class="role-tag">Impacket</span><span class="role-tag">CrackMapExec</span><span class="role-tag">Rubeus</span></div>
+      </div>
+      <div class="role-divider"></div>
+      <div class="what-section">
+        <div class="what-title">What You Do Daily</div>
+        <ul class="what-list"><li>Map AD attack paths with BloodHound to find shortest route to Domain Admin</li><li>Perform Kerberoasting to extract and crack service account hashes offline</li><li>Execute Pass-the-Hash and Pass-the-Ticket attacks for authenticated lateral movement</li><li>Run DCSync to dump all domain credential hashes from Domain Controller</li></ul>
+      </div>
+    </div>
+    <div class="role-card">
+      <div class="role-card-top">
+        <span class="role-number">07</span>
+        <div class="role-title-wrap">
+          <div class="role-title">Wireless (Wi-Fi) Security Testing</div>
+          <span class="diff-badge diff-beginner">Beginner</span>
+        </div>
+      </div>
+      <div class="role-divider"></div>
+      <div class="role-card-body">
+        <p class="role-desc">Wireless Security Testers attack Wi-Fi networks and protocols. From cracking WPA2 handshakes to deploying rogue access points and evil twins, they identify wireless configuration flaws that expose organizations to credential theft and internal network infiltration.</p>
+        <div class="role-tags"><span class="role-tag">Aircrack-ng</span><span class="role-tag">Hashcat</span><span class="role-tag">Kismet</span><span class="role-tag">Alfa Adapters</span><span class="role-tag">Wireshark</span></div>
+      </div>
+      <div class="role-divider"></div>
+      <div class="what-section">
+        <div class="what-title">What You Do Daily</div>
+        <ul class="what-list"><li>Capture WPA2 4-way handshakes and crack them with Hashcat and wordlists</li><li>Deploy evil twin access points with captive portals to capture employee credentials</li><li>Perform targeted deauthentication attacks to force client reconnection to rogue APs</li><li>Identify and exploit PMKID attacks and test for legacy WEP/WPA networks</li></ul>
+      </div>
+    </div>
+    <div class="role-card">
+      <div class="role-card-top">
+        <span class="role-number">08</span>
+        <div class="role-title-wrap">
+          <div class="role-title">Social Engineering (Phishing, Human Attacks)</div>
+          <span class="diff-badge diff-beginner">Beginner</span>
+        </div>
+      </div>
+      <div class="role-divider"></div>
+      <div class="role-card-body">
+        <p class="role-desc">Social Engineers exploit the human element — the most vulnerable attack surface in any organization. They craft convincing phishing emails, vishing calls, physical pretexting scenarios, and smishing campaigns to trick employees into revealing credentials or granting unauthorized access.</p>
+        <div class="role-tags"><span class="role-tag">GoPhish</span><span class="role-tag">SET Toolkit</span><span class="role-tag">Evilginx</span><span class="role-tag">OSINT Framework</span><span class="role-tag">Maltego</span></div>
+      </div>
+      <div class="role-divider"></div>
+      <div class="what-section">
+        <div class="what-title">What You Do Daily</div>
+        <ul class="what-list"><li>Design and execute spear-phishing campaigns targeting specific high-value employees</li><li>Clone legitimate login portals using Evilginx to capture credentials and 2FA tokens simultaneously</li><li>Conduct vishing calls impersonating IT helpdesk to extract passwords over the phone</li><li>Perform physical social engineering — tailgating, badge cloning, USB drop attacks</li></ul>
+      </div>
+    </div>
+    <div class="role-card">
+      <div class="role-card-top">
+        <span class="role-number">09</span>
+        <div class="role-title-wrap">
+          <div class="role-title">Exploit Development</div>
+          <span class="diff-badge diff-expert">Expert</span>
+        </div>
+      </div>
+      <div class="role-divider"></div>
+      <div class="role-card-body">
+        <p class="role-desc">Exploit Developers write custom attack code that weaponizes software vulnerabilities. They analyze crash dumps, craft buffer overflow exploits, bypass DEP/ASLR/CFG protections, develop ROP chains, and turn proof-of-concept bugs into reliable, working exploits for authorized use.</p>
+        <div class="role-tags"><span class="role-tag">GDB / pwndbg</span><span class="role-tag">pwntools</span><span class="role-tag">IDA Pro</span><span class="role-tag">ROPgadget</span><span class="role-tag">WinDbg</span></div>
+      </div>
+      <div class="role-divider"></div>
+      <div class="what-section">
+        <div class="what-title">What You Do Daily</div>
+        <ul class="what-list"><li>Fuzz applications with AFL++/libFuzzer to discover memory corruption vulnerabilities</li><li>Craft ROP chains to bypass No-Execute (NX/DEP) and ASLR memory protections</li><li>Develop position-independent shellcode payloads for various target architectures</li><li>Write detailed technical write-ups and submit PoC exploits to bug bounty programs</li></ul>
+      </div>
+    </div>
+    <div class="role-card">
+      <div class="role-card-top">
+        <span class="role-number">10</span>
+        <div class="role-title-wrap">
+          <div class="role-title">Malware Development (Advanced Red Team)</div>
+          <span class="diff-badge diff-expert">Expert</span>
+        </div>
+      </div>
+      <div class="role-divider"></div>
+      <div class="role-card-body">
+        <p class="role-desc">Malware Developers create custom offensive tools — C2 implants, loaders, droppers, and stagers — used in red team operations. They write code that evades modern AV and EDR solutions, simulating advanced persistent threats (APTs) to test an organization's detection capabilities.</p>
+        <div class="role-tags"><span class="role-tag">C / C++ / Rust</span><span class="role-tag">Cobalt Strike</span><span class="role-tag">AV/EDR Evasion</span><span class="role-tag">AMSI Bypass</span><span class="role-tag">Process Injection</span></div>
+      </div>
+      <div class="role-divider"></div>
+      <div class="what-section">
+        <div class="what-title">What You Do Daily</div>
+        <ul class="what-list"><li>Write custom C2 implants with encrypted, domain-fronted communications to evade network detection</li><li>Develop shellcode loaders using process injection (hollowing, DLL injection, reflective loading)</li><li>Build AMSI bypass, ETW patching, and EDR unhooking techniques to evade real-time detection</li><li>Simulate APT malware TTPs (persistence, keylogging, credential harvest) for realistic engagements</li></ul>
+      </div>
+    </div>
+    <div class="role-card">
+      <div class="role-card-top">
+        <span class="role-number">11</span>
+        <div class="role-title-wrap">
+          <div class="role-title">Hardware / IoT / Embedded Device Hacking</div>
+          <span class="diff-badge diff-advanced">Advanced</span>
+        </div>
+      </div>
+      <div class="role-divider"></div>
+      <div class="role-card-body">
+        <p class="role-desc">Hardware Hackers attack physical devices — smart cameras, industrial controllers, medical devices, and access control systems. They extract firmware, analyze hardware protocols (UART, JTAG, SPI), find logic flaws in device software, and demonstrate physical attack paths.</p>
+        <div class="role-tags"><span class="role-tag">UART / JTAG</span><span class="role-tag">Binwalk</span><span class="role-tag">Ghidra</span><span class="role-tag">Bus Pirate</span><span class="role-tag">RTL-SDR</span></div>
+      </div>
+      <div class="role-divider"></div>
+      <div class="what-section">
+        <div class="what-title">What You Do Daily</div>
+        <ul class="what-list"><li>Extract and reverse-engineer firmware from IoT devices using Binwalk and Ghidra</li><li>Identify UART/JTAG debug interfaces on PCBs to gain privileged shell access to devices</li><li>Capture and replay RF signals (433 MHz, Z-Wave, BLE) to clone or spoof wireless access</li><li>Analyze industrial ICS/SCADA protocols (Modbus, DNP3) for authentication and logic vulnerabilities</li></ul>
+      </div>
+    </div>
+    <div class="role-card">
+      <div class="role-card-top">
+        <span class="role-number">12</span>
+        <div class="role-title-wrap">
+          <div class="role-title">Red Team Operations (Full-scope Attack Simulation)</div>
+          <span class="diff-badge diff-expert">Expert</span>
+        </div>
+      </div>
+      <div class="role-divider"></div>
+      <div class="role-card-body">
+        <p class="role-desc">Red Team Operators run full-scope, multi-week adversarial simulations combining all techniques — phishing, exploitation, lateral movement, persistence, and data exfiltration — to realistically simulate APT-level threats without the Blue Team knowing it's happening.</p>
+        <div class="role-tags"><span class="role-tag">Cobalt Strike</span><span class="role-tag">Sliver C2</span><span class="role-tag">MITRE ATT&CK</span><span class="role-tag">OPSEC</span><span class="role-tag">TIBER-EU</span></div>
+      </div>
+      <div class="role-divider"></div>
+      <div class="what-section">
+        <div class="what-title">What You Do Daily</div>
+        <ul class="what-list"><li>Plan full engagement attack scenarios based on threat intelligence relevant to the target industry</li><li>Execute multi-stage kill chains: initial access → persistence → lateral movement → data exfil</li><li>Maintain strict OPSEC throughout to avoid detection by the blue team and security controls</li><li>Deliver executive and technical reports with full attack narrative, timeline, and remediation roadmap</li></ul>
+      </div>
+    </div>
+    <div class="no-results" id="no-results">No roles match your search.</div>
+  </div>
+
+  <!-- CAREER TIPS -->
+  <div class="tips-section">
+    <div class="tips-title">&#9632; Career Tips &amp; Certifications</div>
+    <div class="tips-grid">
+      <div class="tip-item"><div class="tip-label">Entry Cert</div><div class="tip-text">Start with eJPT (eLearnSecurity) or CompTIA PenTest+. These are beginner-friendly and vendor-neutral.</div></div><div class="tip-item"><div class="tip-label">First Practice</div><div class="tip-text">HackTheBox and TryHackMe are essential practice platforms. Start with "easy" boxes.</div></div><div class="tip-item"><div class="tip-label">Key Milestone</div><div class="tip-text">OSCP (Offensive Security Certified Professional) is the gold standard — aim for it after 1 year of practice.</div></div><div class="tip-item"><div class="tip-label">Bug Bounty</div><div class="tip-text">HackerOne and Bugcrowd let you practice legally and get paid. Start with low-complexity targets.</div></div>
+    </div>
+  </div>
+
+  <div class="footer">&#9632; Red Team — Offensive Security &#9632;</div>
+</div>
+
+<script>
+const GRID_COLOR='rgba(255,62,108,0.04)';
+const LINE_COLOR='255,62,108';
+const PT_COLOR='255,62,108';
+/* CANVAS */
+const canvas=document.getElementById('canvas-bg'),ctx=canvas.getContext('2d');
+let W,H,pts=[];
+function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;}
+resize();window.addEventListener('resize',()=>{resize();initPts();});
+function initPts(){pts=[];const n=Math.floor((W*H)/13500);for(let i=0;i<n;i++)pts.push({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.4+0.4,vx:(Math.random()-.5)*.25,vy:(Math.random()-.5)*.25,a:Math.random()*.42+.15});}
+initPts();
+function drawGrid(){ctx.strokeStyle=GRID_COLOR;ctx.lineWidth=.5;for(let x=0;x<W;x+=60){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}for(let y=0;y<H;y+=60){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}}
+function frame(){ctx.clearRect(0,0,W,H);drawGrid();for(let i=0;i<pts.length;i++)for(let j=i+1;j<pts.length;j++){const dx=pts[i].x-pts[j].x,dy=pts[i].y-pts[j].y,d=Math.sqrt(dx*dx+dy*dy);if(d<108){ctx.beginPath();ctx.strokeStyle=`rgba(${LINE_COLOR},${.09*(1-d/108)})`;ctx.lineWidth=.5;ctx.moveTo(pts[i].x,pts[i].y);ctx.lineTo(pts[j].x,pts[j].y);ctx.stroke();}}pts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0)p.x=W;if(p.x>W)p.x=0;if(p.y<0)p.y=H;if(p.y>H)p.y=0;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle=`rgba(${PT_COLOR},${p.a})`;ctx.fill();});requestAnimationFrame(frame);}
+frame();
+
+/* SCROLL PROGRESS */
+const bar=document.getElementById('scroll-bar');
+window.addEventListener('scroll',()=>{const pct=(window.scrollY/(document.documentElement.scrollHeight-window.innerHeight))*100;bar.style.width=Math.min(100,pct)+'%';},{ passive:true });
+
+/* SEARCH FILTER */
+const searchBox=document.getElementById('role-search');
+const cards=document.querySelectorAll('.role-card');
+const countEl=document.getElementById('search-count');
+const noRes=document.getElementById('no-results');
+function updateSearch(){
+  const q=searchBox.value.toLowerCase().trim();
+  let shown=0;
+  cards.forEach(c=>{
+    const text=c.textContent.toLowerCase();
+    const match=!q||text.includes(q);
+    c.style.display=match?'':'none';
+    if(match)shown++;
+  });
+  countEl.textContent=q?`Showing ${shown} of ${cards.length} roles`:`${cards.length} roles`;
+  noRes.style.display=(shown===0&&q)?'block':'none';
+}
+if(searchBox){searchBox.addEventListener('input',updateSearch);updateSearch();}
+
+</script>
+</body>
+</html>
